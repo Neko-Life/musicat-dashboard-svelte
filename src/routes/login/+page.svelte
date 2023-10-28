@@ -14,6 +14,7 @@
 		}
 	});
 
+	// !TODO: get redir from search params
 	const successRedir = encodeURIComponent('/');
 
 	const loginQuery = useGetLogin({
