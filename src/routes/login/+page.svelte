@@ -65,7 +65,7 @@
 </script>
 
 <div class="page-container">
-	<h1>{loader}</h1>
+	<h1>{$loginQuery.isError ? 'Error logging in' : loader}</h1>
 </div>
 
 <style>
