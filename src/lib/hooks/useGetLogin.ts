@@ -14,6 +14,11 @@ export function getDefaultGetLoginSuccessHandler({
 }: IGetDefaultGetLoginSuccessHandlerParams) {
 	return (data: Response) => {
 		data.json().then((r: IBaseAPIResponse<string>) => {
+			if (!r.success) {
+				console.error('getLogin.json');
+				return;
+			}
+
 			const redir = '&redirect=' + encodeURIComponent(origin + '/login');
 
 			const g = r.data + redir;

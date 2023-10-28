@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let disabled: boolean;
+	export let disabled: boolean = false;
 </script>
 
 <button class="btn {$$props.class}" on:click {disabled}>

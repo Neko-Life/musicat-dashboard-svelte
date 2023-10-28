@@ -26,8 +26,6 @@
 		if (!query) return;
 
 		if (!query.ok) {
-			console.error(query);
-
 			setBotPreviewStates();
 			return;
 		}
