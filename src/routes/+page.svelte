@@ -22,25 +22,28 @@
 		states = { ...states };
 	};
 
-	const botPreviewQueryId = 'get-bot-preview';
-	const botPreview = useQuery(botPreviewQueryId, getBotPreview);
+	const processBotPreview = (query: Response) => {
+		if (!query) return;
 
-	const processBotPreview = (query: typeof $botPreview) => {
-		if (!query.data) return;
-
-		if (!query.data.ok) {
-			console.error(query.data);
+		if (!query.ok) {
+			console.error(query);
 
 			setBotPreviewStates();
 			return;
 		}
 
-		query.data.json().then((r: IBaseAPIResponse<IBotPreview>) => {
+		query.json().then((r: IBaseAPIResponse<IBotPreview>) => {
 			setBotPreviewStates(r.data);
 		});
 	};
 
-	$: processBotPreview($botPreview);
+	const botPreviewQueryId = 'get-bot-preview';
+	const botPreview = useQuery(botPreviewQueryId, getBotPreview, {
+		onSuccess(data) {
+			processBotPreview(data);
+		}
+	});
+	$botPreview;
 </script>
 
 <Navbar />
