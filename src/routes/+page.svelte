@@ -1,21 +1,60 @@
-<script>
+<script lang="ts">
 	import Navbar from '$lib/components/Navbar.svelte';
+	import { useQuery } from '@sveltestack/svelte-query';
+	import { getBotPreview } from '$lib/services/general';
+	import type { IBotPreview } from '$lib/interfaces/services/general';
+	import type { IBaseAPIResponse } from '$lib/interfaces/services';
+
+	let states: {
+		avatarSrc: string;
+		username: string;
+		description: string;
+	} = {
+		avatarSrc: '',
+		username: '',
+		description: ''
+	};
+
+	const setBotPreviewStates = ({ avatar_url = '', username = '', description = '' } = {}) => {
+		states.avatarSrc = avatar_url;
+		states.username = username;
+		states.description = description;
+		states = { ...states };
+	};
+
+	const botPreviewQueryId = 'get-bot-preview';
+	const botPreview = useQuery(botPreviewQueryId, getBotPreview);
+
+	const processBotPreview = (query: typeof $botPreview) => {
+		if (!query.data) return;
+
+		if (!query.data.ok) {
+			console.error(query.data);
+
+			setBotPreviewStates();
+			return;
+		}
+
+		query.data.json().then((r: IBaseAPIResponse<IBotPreview>) => {
+			setBotPreviewStates(r.data);
+		});
+	};
+
+	$: processBotPreview($botPreview);
 </script>
 
 <Navbar />
 
 <div class="page-container">
-	<div class="avatar-container">
-		<img
-			loading="lazy"
-			src="https://cdn.discordapp.com/avatars/960168583969767424/97a14ce9e4106bc2a441c7d4ed438912.png?size=480"
-			alt="Bot Avatar"
-		/>
+	<div class="avatar-container {states.avatarSrc.length ? 'active' : ''}">
+		<img loading="lazy" src={states.avatarSrc} alt="" width="100%" />
 	</div>
 
-	<h1>Musicat</h1>
+	<div class="desc-container">
+		<h1>{states.username}</h1>
 
-	<p>Discord Music Bot written in C++</p>
+		<p>{states.description}</p>
+	</div>
 </div>
 
 <style>
@@ -29,13 +68,31 @@
 
 	.page-container {
 		flex-grow: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
 	}
 
-	.avatar-container {
+	.avatar-container.active {
 		border-radius: 999px;
 		overflow: hidden;
 		box-shadow: 0px 0px 200px 10px rgba(255, 255, 255, 0.4);
-		width: 480px;
-		height: 480px;
+		width: 256px;
+		height: 256px;
+	}
+
+	.avatar-container img {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.desc-container {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		justify-content: center;
+		align-items: center;
+		min-height: 74px;
 	}
 </style>

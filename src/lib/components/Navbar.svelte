@@ -10,16 +10,16 @@
 
 	const getLoginQueryId = 'get-login';
 
-	const query = useQuery(getLoginQueryId, getLogin, {
+	const loginQuery = useQuery(getLoginQueryId, getLogin, {
 		enabled: shouldGetLogin,
 		onSuccess: (data) => {
 			console.log({ data });
 		}
 	});
-	$query;
+	$loginQuery;
 
 	$: {
-		query.setEnabled(shouldGetLogin);
+		loginQuery.setEnabled(shouldGetLogin);
 	}
 
 	let btnTimer: ReturnType<typeof setTimeout> | null = null;
