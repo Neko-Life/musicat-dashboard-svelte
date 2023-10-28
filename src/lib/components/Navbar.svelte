@@ -1,30 +1,25 @@
 <script lang="ts">
 	import { useQueryClient } from '@sveltestack/svelte-query';
 	import Button from './common/Button.svelte';
-	import useGetLogin from '$lib/hooks/useGetLogin';
+	import useGetLogin, { getDefaultGetLoginSuccessHandler } from '$lib/hooks/useGetLogin';
 	import { clearTimer, setTimer } from '$lib/utils/timer';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import type { IBaseAPIResponse } from '$lib/interfaces/services';
 	import { getLoginQueryId } from '$lib/config/queryIds';
 
 	let shouldGetLogin = false;
 
 	const queryClient = useQueryClient();
 
-	const handleGetLoginResponse = (data: Response) => {
-		data.json().then((r: IBaseAPIResponse<string>) => {
-			const redir = '&redirect=' + encodeURIComponent($page.url.origin + '/login');
-
-			const g = r.data + redir;
-
-			console.log({ g });
-
-			goto(g);
-		});
-	};
-
 	const successRedir = encodeURIComponent($page.url.pathname);
+
+	const handleGetLoginResponse = getDefaultGetLoginSuccessHandler({
+		origin: $page.url.origin,
+		goto,
+		cb: () => {
+			timerReset();
+		}
+	});
 
 	const loginQuery = useGetLogin({
 		successRedirect: successRedir,
@@ -49,9 +44,9 @@
 	};
 
 	const handleLoginClick = () => {
+		clearBtnTimer();
 		shouldGetLogin = true;
 		loginQuery.setEnabled(true);
-		clearBtnTimer();
 		setBtnTimer();
 	};
 </script>
