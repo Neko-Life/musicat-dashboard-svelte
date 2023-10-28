@@ -12,29 +12,26 @@ export function getDefaultGetLoginSuccessHandler({
 	goto,
 	cb
 }: IGetDefaultGetLoginSuccessHandlerParams) {
-	return (data: Response) => {
-		data.json().then((r: IBaseAPIResponse<string>) => {
-			if (!r.success) {
-				console.error('getLogin.json');
-				return;
-			}
+	return (r: IBaseAPIResponse<string>) => {
+		if (!r.success) {
+			console.error('getLogin.json');
+			return;
+		}
 
-			const redir = '&redirect=' + encodeURIComponent(origin + '/login');
+		const redir = '&redirect=' + encodeURIComponent(origin + '/login');
 
-			const g = r.data + redir;
+		const g = r.data + redir;
 
-			console.log({ g });
+		console.log({ g });
 
-			cb?.();
+		cb?.();
 
-			goto(g);
-		});
+		goto(g);
 	};
 }
 
-export default function useGetLogin({ successRedirect, onSuccess }: IUseGetLoginParams) {
+export default function useGetLogin({ successRedirect }: IUseGetLoginParams) {
 	return useQuery(getLoginQueryId, () => getLogin({ headerRedirect: successRedirect }), {
-		enabled: false,
-		onSuccess
+		enabled: false
 	});
 }

@@ -2,59 +2,22 @@
 	import Navbar from '$lib/components/Navbar.svelte';
 	import { useQuery } from '@sveltestack/svelte-query';
 	import { getBotPreview } from '$lib/services/general';
-	import type { IBotPreview } from '$lib/interfaces/services/general';
-	import type { IBaseAPIResponse } from '$lib/interfaces/services';
-
-	let states: {
-		avatarSrc: string;
-		username: string;
-		description: string;
-	} = {
-		avatarSrc: '',
-		username: '',
-		description: ''
-	};
-
-	const setBotPreviewStates = ({ avatar_url = '', username = '', description = '' } = {}) => {
-		states.avatarSrc = avatar_url;
-		states.username = username;
-		states.description = description;
-		states = { ...states };
-	};
-
-	const processBotPreview = (query: Response) => {
-		if (!query) return;
-
-		if (!query.ok) {
-			setBotPreviewStates();
-			return;
-		}
-
-		query.json().then((r: IBaseAPIResponse<IBotPreview>) => {
-			setBotPreviewStates(r.data);
-		});
-	};
 
 	const botPreviewQueryId = 'get-bot-preview';
-	const botPreview = useQuery(botPreviewQueryId, getBotPreview, {
-		onSuccess(data) {
-			processBotPreview(data);
-		}
-	});
-	$botPreview;
+	const botPreview = useQuery(botPreviewQueryId, getBotPreview);
 </script>
 
 <Navbar />
 
 <div class="page-container">
-	<div class="avatar-container {states.avatarSrc.length ? 'active' : ''}">
-		<img loading="lazy" src={states.avatarSrc} alt="" width="100%" />
+	<div class="avatar-container {$botPreview.data?.data.avatar_url.length ? 'active' : ''}">
+		<img loading="lazy" src={$botPreview.data?.data.avatar_url} alt="" width="100%" />
 	</div>
 
 	<div class="desc-container">
-		<h1>{states.username}</h1>
+		<h1>{$botPreview.data?.data.username || ''}</h1>
 
-		<p>{states.description}</p>
+		<p>{$botPreview.data?.data.description || ''}</p>
 	</div>
 </div>
 

@@ -1,4 +1,10 @@
-import type { IGetLoginParams, IPostLoginData } from '$lib/interfaces/services/auth';
+import type { IBaseAPIResponse } from '$lib/interfaces/services';
+import type {
+	IGetLoginParams,
+	IPostLoginData,
+	IPostLoginResponse
+} from '$lib/interfaces/services/auth';
+import { processResponse } from '$lib/utils/fetch';
 import { getAPIUrl } from '$lib/utils/services';
 
 export async function getLogin({ headerRedirect }: IGetLoginParams = {}) {
@@ -10,20 +16,20 @@ export async function getLogin({ headerRedirect }: IGetLoginParams = {}) {
 		headers.push(['redirect-param', headerRedirect]);
 	}
 
-	const res = fetch(url, {
+	const res = await fetch(url, {
 		headers
 	});
 
-	return res;
+	return processResponse<IBaseAPIResponse<string>>(res);
 }
 
 export async function postLogin(data: IPostLoginData) {
 	const url = getAPIUrl('/login');
 
-	const res = fetch(url, {
+	const res = await fetch(url, {
 		method: 'POST',
 		body: JSON.stringify(data)
 	});
 
-	return res;
+	return processResponse<IBaseAPIResponse<IPostLoginResponse>>(res);
 }

@@ -5,7 +5,6 @@
 	import { onMount } from 'svelte';
 	import { postLogin } from '$lib/services/auth';
 	import type { IBaseAPIResponse, IErrorPayload } from '$lib/interfaces/services';
-	import type { IPostLoginResponse } from '$lib/interfaces/services/auth';
 
 	let loader = 'Logging in...';
 
@@ -20,10 +19,8 @@
 	const successRedir = encodeURIComponent($page.url.searchParams.get('redirect') || '/');
 
 	const loginQuery = useGetLogin({
-		successRedirect: successRedir,
-		onSuccess: handleGetLoginResponse
+		successRedirect: successRedir
 	});
-	$loginQuery;
 
 	onMount(() => {
 		const code = $page.url.searchParams.get('code');
@@ -42,26 +39,24 @@
 			return;
 		}
 
-		postLogin({ code, state }).then((r: Response) => {
-			if (!r.ok) {
-				loader = 'Error while logging in';
-				return;
-			}
-
-			r.json().then((d: IBaseAPIResponse<IPostLoginResponse>) => {
-				if (!d.success) {
+		postLogin({ code, state })
+			.then((data) => {
+				if (!data.success) {
 					loader =
 						'Error while logging in: ' +
-						(d as unknown as IBaseAPIResponse<IErrorPayload>).data.code;
+						(data as unknown as IBaseAPIResponse<IErrorPayload>).data.code;
 
 					return;
 				}
 
-				localStorage.setItem('access_token', d.data.access_token);
-				goto(d.data.redirect);
-			});
-		});
+				goto(data.data.redirect);
+			})
+			.catch(console.error);
 	});
+
+	$: if ($loginQuery.data) {
+		handleGetLoginResponse($loginQuery.data);
+	}
 </script>
 
 <div class="page-container">
