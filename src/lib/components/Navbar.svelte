@@ -3,6 +3,9 @@
 	import Button from './common/Button.svelte';
 	import { getLogin } from '$lib/services/auth';
 	import { clearTimer, setTimer } from '$lib/utils/timer';
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
+	import type { IBaseAPIResponse } from '$lib/interfaces/services';
 
 	let shouldGetLogin = false;
 
@@ -10,17 +13,25 @@
 
 	const getLoginQueryId = 'get-login';
 
-	const loginQuery = useQuery(getLoginQueryId, getLogin, {
-		enabled: shouldGetLogin,
-		onSuccess: (data) => {
-			console.log({ data });
-		}
+	const handleGetLoginResponse = (data: Response) => {
+		data.json().then((r: IBaseAPIResponse<string>) => {
+			const redir = '&redirect=' + encodeURIComponent($page.url.origin + '/login');
+
+			const g = r.data + redir;
+
+			console.log(g);
+
+			goto(g);
+		});
+	};
+
+	const successRedir = encodeURIComponent($page.url.pathname);
+
+	const loginQuery = useQuery(getLoginQueryId, () => getLogin({ successRedir }), {
+		enabled: false,
+		onSuccess: handleGetLoginResponse
 	});
 	$loginQuery;
-
-	$: {
-		loginQuery.setEnabled(shouldGetLogin);
-	}
 
 	let btnTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -30,6 +41,7 @@
 
 	const timerReset = () => {
 		shouldGetLogin = false;
+		loginQuery.setEnabled(false);
 		queryClient.invalidateQueries(getLoginQueryId);
 	};
 
@@ -39,6 +51,7 @@
 
 	const handleLoginClick = () => {
 		shouldGetLogin = true;
+		loginQuery.setEnabled(true);
 		clearBtnTimer();
 		setBtnTimer();
 	};
