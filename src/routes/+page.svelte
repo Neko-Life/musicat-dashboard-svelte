@@ -7,6 +7,7 @@
 <div class="page-container">
 	<div class="avatar-container">
 		<img
+			loading="lazy"
 			src="https://cdn.discordapp.com/avatars/960168583969767424/97a14ce9e4106bc2a441c7d4ed438912.png?size=480"
 			alt="Bot Avatar"
 		/>

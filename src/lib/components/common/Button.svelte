@@ -1,12 +1,26 @@
-<button class="btn" {...$$restProps}>
+<script lang="ts">
+	export let disabled: boolean;
+</script>
+
+<button class="btn {$$props.class}" on:click {disabled}>
 	<slot />
 </button>
 
 <style>
 	.btn {
+		background-color: var(--default-btn-bg-color);
+		transition-duration: 0.2s;
+		border: 0;
+		border-radius: 8px;
 	}
 
 	.btn:hover {
-		scale: 105%;
+		background-color: var(--default-btn-bg-color-hover);
+	}
+
+	.btn-login {
+		padding: 8px 12px;
+		font-size: 16px;
+		box-shadow: 0px 0px 10px 1px rgba(255, 255, 255, 0.5);
 	}
 </style>

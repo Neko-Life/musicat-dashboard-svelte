@@ -16,6 +16,9 @@ body.dark {
 	--default-text-color: white;
 	--default-bg-body: black;
 	--default-button-text-color: black;
+
+	--default-btn-bg-color: white;
+	--default-btn-bg-color-hover: #dcdcdc;
 }
 
 #root {

@@ -1,12 +1,60 @@
+<script lang="ts">
+	import { useQuery, useQueryClient } from '@sveltestack/svelte-query';
+	import Button from './common/Button.svelte';
+	import { getLogin } from '$lib/services/auth';
+	import { clearTimer, setTimer } from '$lib/utils/timer';
+
+	let shouldGetLogin = false;
+
+	const queryClient = useQueryClient();
+
+	const getLoginQueryId = 'get-login';
+
+	const query = useQuery(getLoginQueryId, getLogin, {
+		enabled: shouldGetLogin,
+		onSuccess: (data) => {
+			console.log({ data });
+		}
+	});
+	$query;
+
+	$: {
+		query.setEnabled(shouldGetLogin);
+	}
+
+	let btnTimer: ReturnType<typeof setTimeout> | null = null;
+
+	const clearBtnTimer = () => {
+		clearTimer(btnTimer);
+	};
+
+	const timerReset = () => {
+		shouldGetLogin = false;
+		queryClient.invalidateQueries(getLoginQueryId);
+	};
+
+	const setBtnTimer = () => {
+		btnTimer = setTimer(btnTimer, timerReset, 5000);
+	};
+
+	const handleLoginClick = () => {
+		shouldGetLogin = true;
+		clearBtnTimer();
+		setBtnTimer();
+	};
+</script>
+
 <div id="top-navbar">
 	<div class="btn-login-container">
-		<button class="btn-login">Login</button>
+		<Button class="btn-login" on:click={handleLoginClick} disabled={shouldGetLogin}>Login</Button>
 	</div>
 </div>
 
 <style>
 	#top-navbar {
-		position: sticky;
+		position: fixed;
+		width: 100%;
+		box-sizing: border-box;
 		top: 0;
 		display: flex;
 		justify-content: flex-end;
@@ -19,11 +67,5 @@
 		justify-content: center;
 		align-items: center;
 		padding: 0px 24px;
-	}
-
-	.btn-login {
-		padding: 8px 12px;
-		font-size: 16px;
-		box-shadow: 0px 0px 10px 1px rgba(255, 255, 255, 0.5);
 	}
 </style>
