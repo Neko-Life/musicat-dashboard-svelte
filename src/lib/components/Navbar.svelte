@@ -1,17 +1,16 @@
 <script lang="ts">
-	import { useQuery, useQueryClient } from '@sveltestack/svelte-query';
+	import { useQueryClient } from '@sveltestack/svelte-query';
 	import Button from './common/Button.svelte';
-	import { getLogin } from '$lib/services/auth';
+	import useGetLogin from '$lib/hooks/useGetLogin';
 	import { clearTimer, setTimer } from '$lib/utils/timer';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import type { IBaseAPIResponse } from '$lib/interfaces/services';
+	import { getLoginQueryId } from '$lib/config/queryIds';
 
 	let shouldGetLogin = false;
 
 	const queryClient = useQueryClient();
-
-	const getLoginQueryId = 'get-login';
 
 	const handleGetLoginResponse = (data: Response) => {
 		data.json().then((r: IBaseAPIResponse<string>) => {
@@ -19,7 +18,7 @@
 
 			const g = r.data + redir;
 
-			console.log(g);
+			console.log({ g });
 
 			goto(g);
 		});
@@ -27,8 +26,8 @@
 
 	const successRedir = encodeURIComponent($page.url.pathname);
 
-	const loginQuery = useQuery(getLoginQueryId, () => getLogin({ successRedir }), {
-		enabled: false,
+	const loginQuery = useGetLogin({
+		successRedirect: successRedir,
 		onSuccess: handleGetLoginResponse
 	});
 	$loginQuery;
