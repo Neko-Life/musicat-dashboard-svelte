@@ -17,7 +17,7 @@
 		}
 	});
 
-	const successRedir = $page.url.searchParams.get('redirect') || '/';
+	const successRedir = decodeURIComponent($page.url.searchParams.get('redirect') || '') || '/';
 
 	const loginQuery = useGetLogin({
 		successRedirect: successRedir
@@ -53,6 +53,7 @@
 				goto(data.data.redirect);
 			})
 			.catch((r: Response) => {
+				console.error(r);
 				loader = 'Error with status ' + r.status;
 			});
 	});
