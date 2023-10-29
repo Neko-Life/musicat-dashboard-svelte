@@ -5,6 +5,7 @@ export interface IGetLoginParams {
 export interface IPostLoginData {
 	code: string;
 	state: string;
+	redirect_uri: string;
 }
 
 export interface IPostLoginResponse {

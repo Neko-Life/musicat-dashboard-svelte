@@ -8,15 +8,16 @@
 
 	let loader = 'Logging in...';
 
+	const origin = $page.url.origin;
 	const handleGetLoginResponse = getDefaultGetLoginSuccessHandler({
-		origin: $page.url.origin,
+		origin,
 		goto,
 		cb: () => {
 			loginQuery.setEnabled(false);
 		}
 	});
 
-	const successRedir = encodeURIComponent($page.url.searchParams.get('redirect') || '/');
+	const successRedir = $page.url.searchParams.get('redirect') || '/';
 
 	const loginQuery = useGetLogin({
 		successRedirect: successRedir
@@ -39,7 +40,7 @@
 			return;
 		}
 
-		postLogin({ code, state })
+		postLogin({ code, state, redirect_uri: origin + '/login' })
 			.then((data) => {
 				if (!data.success) {
 					loader =
@@ -51,7 +52,9 @@
 
 				goto(data.data.redirect);
 			})
-			.catch(console.error);
+			.catch((r: Response) => {
+				loader = 'Error with status ' + r.status;
+			});
 	});
 
 	$: if ($loginQuery.data) {
