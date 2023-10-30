@@ -17,7 +17,8 @@ export async function getLogin({ headerRedirect }: IGetLoginParams = {}) {
 	}
 
 	const res = await fetch(url, {
-		headers
+		headers,
+		credentials: 'include'
 	});
 
 	return processResponse<IBaseAPIResponse<string>>(res);
@@ -28,7 +29,8 @@ export async function postLogin(data: IPostLoginData) {
 
 	const res = await fetch(url, {
 		method: 'POST',
-		body: JSON.stringify(data)
+		body: JSON.stringify(data),
+		credentials: 'include'
 	});
 
 	return processResponse<IBaseAPIResponse<IPostLoginResponse>>(res);

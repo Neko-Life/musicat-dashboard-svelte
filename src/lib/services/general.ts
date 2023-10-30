@@ -6,7 +6,9 @@ import { getAPIUrl } from '$lib/utils/services';
 export async function getBotPreview() {
 	const url = getAPIUrl('/');
 
-	const res = await fetch(url);
+	const res = await fetch(url, {
+		credentials: 'include'
+	});
 
 	return processResponse<IBaseAPIResponse<IBotPreview>>(res);
 }
