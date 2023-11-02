@@ -2,18 +2,35 @@
 	import Button from './common/Button.svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
+	import { getStorage } from '$lib/utils/localStorage';
 
 	const successRedir = encodeURIComponent($page.url.pathname);
 
 	const handleLoginClick = () => {
 		goto('/login?redirect=' + encodeURIComponent(successRedir));
 	};
+
+	const handleLogoutClick = () => {
+		goto('/logout');
+	};
+
+	const user = getStorage('user');
+// !TODO
 </script>
 
 <div id="top-navbar">
-	<div class="btn-login-container">
-		<Button class="btn-login" on:click={handleLoginClick}>Login</Button>
-	</div>
+	{#if !user}
+		<div class="btn-login-container">
+			<Button class="btn-login" on:click={handleLoginClick}>Login</Button>
+		</div>
+	{:else}
+		<div class="user-info-container">
+			<div class="avatar" />
+			<div class="btn-login-container">
+				<Button class="btn-login" on:click={handleLogoutClick}>Logout</Button>
+			</div>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -33,5 +50,8 @@
 		justify-content: center;
 		align-items: center;
 		padding: 0px 24px;
+	}
+
+	.user-info-container {
 	}
 </style>

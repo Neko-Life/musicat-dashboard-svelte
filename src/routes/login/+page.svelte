@@ -5,6 +5,7 @@
 	import { onMount } from 'svelte';
 	import { postLogin } from '$lib/services/auth';
 	import type { IBaseAPIResponse, IErrorPayload } from '$lib/interfaces/services';
+	import { setStorage } from '$lib/utils/localStorage';
 
 	let loader = 'Logging in...';
 
@@ -50,7 +51,11 @@
 					return;
 				}
 
-				goto(data.data.redirect);
+				const { redirect, user } = data.data;
+
+				setStorage('user', user);
+
+				goto(redirect);
 			})
 			.catch((r: Response) => {
 				console.error(r);
