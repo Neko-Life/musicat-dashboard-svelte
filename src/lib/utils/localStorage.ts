@@ -24,3 +24,7 @@ export function getStorage<K extends ILocalStorageDatasKeys>(
 		return;
 	}
 }
+
+export function removeStorage<K extends ILocalStorageDatasKeys>(key: K) {
+	localStorage.removeItem(key);
+}
