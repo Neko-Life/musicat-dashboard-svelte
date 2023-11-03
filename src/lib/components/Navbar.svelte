@@ -73,11 +73,14 @@
 	}
 
 	.btn-login-container,
-	.btn-logout-container {
+	.btn-logout-container,
+	.user-info-container {
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		padding: 0px 24px;
+		width: 115px;
+		box-sizing: border-box;
 	}
 
 	.btn-logout-container {
@@ -86,9 +89,7 @@
 	}
 
 	.user-info-container {
-		display: flex;
 		flex-direction: column;
-		padding-right: 20px;
 	}
 
 	.avatar-button-dropdown-container {
