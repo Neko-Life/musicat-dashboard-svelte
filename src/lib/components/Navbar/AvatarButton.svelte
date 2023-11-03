@@ -2,7 +2,7 @@
 	export let src: string | undefined;
 </script>
 
-<button class="avatar" on:click>
+<button class="avatar {$$props.class}" on:click>
 	<img loading="lazy" {src} alt="Avatar" />
 </button>
 
@@ -33,5 +33,9 @@
 	.avatar img {
 		max-height: 100%;
 		max-width: 100%;
+	}
+
+	.z-above {
+		z-index: 1;
 	}
 </style>

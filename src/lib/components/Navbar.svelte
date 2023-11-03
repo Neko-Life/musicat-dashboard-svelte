@@ -19,6 +19,7 @@
 
 	let hasUser = false;
 	let userAvatar: string | undefined;
+	let avatarDropdownClass: string = '';
 
 	onMount(() => {
 		const user = getStorage('user');
@@ -36,7 +37,9 @@
 		}
 	});
 
-	const handleAvatarClick = () => {};
+	const handleAvatarClick = () => {
+		avatarDropdownClass = avatarDropdownClass.length ? '' : 'show';
+	};
 </script>
 
 <div id="top-navbar">
@@ -46,10 +49,12 @@
 		</div>
 	{:else}
 		<div class="user-info-container">
-			<AvatarButton on:click={handleAvatarClick} src={userAvatar} />
+			<AvatarButton class="z-above" on:click={handleAvatarClick} src={userAvatar} />
 
-			<div class="btn-login-container">
-				<Button class="btn-login" on:click={handleLogoutClick}>Logout</Button>
+			<div class="avatar-button-dropdown-container {avatarDropdownClass}">
+				<div class="btn-logout-container">
+					<Button class="btn-login" on:click={handleLogoutClick}>Logout</Button>
+				</div>
 			</div>
 		</div>
 	{/if}
@@ -67,16 +72,40 @@
 		padding: 24px;
 	}
 
-	.btn-login-container {
+	.btn-login-container,
+	.btn-logout-container {
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		padding: 0px 24px;
 	}
 
+	.btn-logout-container {
+		position: absolute;
+		padding: 8px;
+	}
+
 	.user-info-container {
 		display: flex;
+		flex-direction: column;
+		padding-right: 20px;
+	}
+
+	.avatar-button-dropdown-container {
+		display: flex;
 		justify-content: center;
-		align-items: center;
+	}
+
+	.avatar-button-dropdown-container .btn-logout-container {
+		transition: opacity 0.5s ease-in, transform 0.5s ease-out, visibility 0.5s ease-out;
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(-100%);
+	}
+
+	.avatar-button-dropdown-container.show .btn-logout-container {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0%);
 	}
 </style>
