@@ -10,7 +10,7 @@
 	const successRedir = encodeURIComponent($page.url.pathname);
 
 	const handleLoginClick = () => {
-		goto('/login?redirect=' + encodeURIComponent(successRedir));
+		goto('/login?redirect=' + successRedir);
 	};
 
 	const handleLogoutClick = () => {
@@ -70,6 +70,7 @@
 		justify-content: flex-end;
 		align-items: center;
 		padding: 24px;
+		z-index: 5;
 	}
 
 	.btn-login-container,

@@ -22,8 +22,6 @@ export function getDefaultGetLoginSuccessHandler({
 
 		const g = r.data + redir;
 
-		console.log({ g });
-
 		cb?.();
 
 		goto(g);

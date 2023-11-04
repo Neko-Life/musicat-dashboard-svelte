@@ -24,6 +24,7 @@
 
 	.avatar:hover {
 		scale: 105%;
+		filter: drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.5));
 	}
 
 	.avatar:active {
