@@ -38,7 +38,7 @@
 	}
 
 	.avatar-container.active {
-		border-radius: 999px;
+		border-radius: 100%;
 		overflow: hidden;
 		box-shadow: 0px 0px 200px 10px rgba(255, 255, 255, 0.4);
 		width: 256px;

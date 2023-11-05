@@ -13,7 +13,7 @@
 		padding: 0;
 		border: 0;
 		overflow: hidden;
-		border-radius: 999px;
+		border-radius: 100%;
 		cursor: pointer;
 		max-width: 48px;
 		max-height: 48px;
