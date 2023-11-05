@@ -11,5 +11,8 @@ export interface IUserGuild {
 	name: string;
 	owner: boolean;
 	permissions: string;
-	// !TODO: add mutual, etc
+	/**
+	 * empty value indicates server error
+	 */
+	is_mutual?: boolean;
 }

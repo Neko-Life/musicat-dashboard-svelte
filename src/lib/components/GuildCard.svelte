@@ -9,6 +9,7 @@
 	<button class="guild-card-container">
 		<div class="img-container">
 			<img
+				class={!guild?.is_mutual ? 'non-mutual' : ''}
 				loading="lazy"
 				src={getGuildIconLink({ guildId: guild.id, hash: guild.icon, size: 128 })}
 				alt="Guild Icon"
@@ -82,5 +83,9 @@
 		text-overflow: ellipsis;
 		font-size: 18px;
 		font-weight: 600;
+	}
+
+	img.non-mutual {
+		filter: grayscale(90%);
 	}
 </style>
