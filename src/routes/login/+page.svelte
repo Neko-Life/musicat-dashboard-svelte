@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import useGetLogin, { getDefaultGetLoginSuccessHandler } from '$lib/hooks/useGetLogin';
+	import useGetLogin, { getDefaultGetLoginSuccessHandler } from '$lib/queries/useGetLogin';
 	import { onMount } from 'svelte';
 	import { postLogin } from '$lib/services/auth';
 	import type { IBaseAPIResponse, IErrorPayload } from '$lib/interfaces/services';

@@ -6,7 +6,7 @@
 	import { getUserAvatarLink } from '$lib/utils/user';
 	import { onMount } from 'svelte';
 	import AvatarButton from './Navbar/AvatarButton.svelte';
-	import useGetMusicatUser from '$lib/hooks/useGetMusicatUser';
+	import useGetMusicatUser from '$lib/queries/useGetMusicatUser';
 
 	const successRedir = encodeURIComponent($page.url.pathname);
 

@@ -2,7 +2,7 @@ import { getLoginQueryId } from '$lib/config/queryIds';
 import type {
 	IGetDefaultGetLoginSuccessHandlerParams,
 	IUseGetLoginParams
-} from '$lib/interfaces/hooks/useGetLogin';
+} from '$lib/interfaces/queries/useGetLogin';
 import type { IBaseAPIResponse } from '$lib/interfaces/services';
 import { getLogin } from '$lib/services/auth';
 import { useQuery } from '@sveltestack/svelte-query';

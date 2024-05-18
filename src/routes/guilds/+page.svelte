@@ -1,7 +1,7 @@
 <script lang="ts">
 	import GuildCard from '$lib/components/GuildCard.svelte';
 	import Navbar from '$lib/components/Navbar.svelte';
-	import useGetUserGuilds from '$lib/hooks/useGetUserGuilds';
+	import useGetUserGuilds from '$lib/queries/useGetUserGuilds';
 
 	const userGuilds = useGetUserGuilds();
 </script>

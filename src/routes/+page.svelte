@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Navbar from '$lib/components/Navbar.svelte';
-	import useGetMusicatUser from '$lib/hooks/useGetMusicatUser';
+	import useGetMusicatUser from '$lib/queries/useGetMusicatUser';
 
 	const musicatUser = useGetMusicatUser();
 </script>
