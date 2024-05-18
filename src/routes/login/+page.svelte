@@ -5,9 +5,14 @@
 	import { onMount } from 'svelte';
 	import { postLogin } from '$lib/services/auth';
 	import type { IBaseAPIResponse, IErrorPayload } from '$lib/interfaces/services';
-	import { setStorage } from '$lib/utils/localStorage';
+	import { setLoggedInUser } from '$lib/utils/user';
 
 	let loader = 'Logging in...';
+
+	let loginQuery: ReturnType<typeof useGetLogin>;
+	$: loginQuery = useGetLogin({
+		successRedirect: successRedir
+	});
 
 	const origin = $page.url.origin;
 	const handleGetLoginResponse = getDefaultGetLoginSuccessHandler({
@@ -19,10 +24,6 @@
 	});
 
 	const successRedir = decodeURIComponent($page.url.searchParams.get('redirect') || '') || '/';
-
-	const loginQuery = useGetLogin({
-		successRedirect: successRedir
-	});
 
 	onMount(() => {
 		const code = $page.url.searchParams.get('code');
@@ -43,7 +44,7 @@
 
 		postLogin({ code, state, redirect_uri: origin + '/login' })
 			.then((data) => {
-                                console.log({data});
+				console.log({ data });
 				if (!data.success) {
 					loader =
 						'Error while logging in: ' +
@@ -54,7 +55,7 @@
 
 				const { redirect, user } = data.data;
 
-				setStorage('user', user);
+				setLoggedInUser(user);
 
 				goto(redirect);
 			})

@@ -1,12 +1,15 @@
 <script lang="ts">
 	import GuildCard from '$lib/components/GuildCard.svelte';
-	import Navbar from '$lib/components/Navbar.svelte';
 	import useGetUserGuilds from '$lib/queries/useGetUserGuilds';
+	import { user } from '$lib/store';
 
-	const userGuilds = useGetUserGuilds();
+	let userGuilds: ReturnType<typeof useGetUserGuilds>;
+	$: userGuilds = useGetUserGuilds({ enabled: !!$user });
 </script>
 
-<Navbar />
+<div class="flex-center">
+	<h1>My Server List</h1>
+</div>
 
 {#if $userGuilds.isError}
 	<div class="error-container">Error getting guilds</div>
@@ -45,6 +48,6 @@
 		max-width: 1366px;
 		flex-wrap: wrap;
 		gap: 20px;
-		padding: 0px 20px 40px 20px;
+		padding: 20px 20px 40px 20px;
 	}
 </style>

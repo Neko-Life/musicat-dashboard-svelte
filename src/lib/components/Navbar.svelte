@@ -1,14 +1,53 @@
 <script lang="ts">
+	export let hidden: boolean | undefined;
+
 	import Button from './common/Button.svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { getStorage } from '$lib/utils/localStorage';
 	import { getUserAvatarLink } from '$lib/utils/user';
-	import { onMount } from 'svelte';
 	import AvatarButton from './Navbar/AvatarButton.svelte';
+	import Menu from './Navbar/Menu.svelte';
 	import useGetMusicatUser from '$lib/queries/useGetMusicatUser';
+	import { user } from '$lib/store';
+	import { matchPath } from '$lib/utils/url';
 
 	const successRedir = encodeURIComponent($page.url.pathname);
+
+	let avatarDropdownClass: string = '';
+
+	let userAvatar: string | undefined;
+	let musicatUser: ReturnType<typeof useGetMusicatUser>;
+	let loggedInMenus: { name: string; path: string }[];
+	let menuList: typeof loggedInMenus;
+
+	$: {
+		musicatUser = useGetMusicatUser();
+
+		if ($user) {
+			userAvatar = getUserAvatarLink({
+				userId: $user.id,
+				hash: $user.avatar,
+				size: 64
+			});
+		} else userAvatar = undefined;
+
+		loggedInMenus = $user
+			? [
+					{
+						name: 'My Server List',
+						path: '/guilds'
+					}
+			  ]
+			: [];
+
+		menuList = [
+			{
+				name: 'Home',
+				path: '/'
+			},
+			...loggedInMenus
+		];
+	}
 
 	const handleLoginClick = () => {
 		goto('/login?redirect=' + successRedir);
@@ -18,28 +57,6 @@
 		goto('/logout');
 	};
 
-	let hasUser = false;
-	let userAvatar: string | undefined;
-	let avatarDropdownClass: string = '';
-
-	const musicatUser = useGetMusicatUser();
-
-	onMount(() => {
-		const user = getStorage('user');
-
-		console.log({ user });
-
-		if (user) {
-			hasUser = true;
-
-			userAvatar = getUserAvatarLink({
-				userId: user.id,
-				hash: user.avatar,
-				size: 64
-			});
-		}
-	});
-
 	const handleAvatarClick = () => {
 		avatarDropdownClass = avatarDropdownClass.length ? '' : 'show';
 	};
@@ -47,19 +64,27 @@
 	const handleMusicatAvatarClick = () => {
 		// window.location.href=
 	};
+
+	const handleMenuClick = (menu: (typeof menuList)[number]) => {
+		goto(menu.path);
+	};
 </script>
 
-<div id="top-navbar">
-	<div>
-		<AvatarButton
-			on:click={handleMusicatAvatarClick}
-			src={$musicatUser?.data?.data?.avatar_url}
-		/>
+<div id="top-navbar" class={hidden ? 'hidden' : ''}>
+	<AvatarButton on:click={handleMusicatAvatarClick} src={$musicatUser?.data?.data?.avatar_url} />
+
+	<div class="menu-list">
+		{#each menuList as menu}
+			<Menu
+				on:click={() => handleMenuClick(menu)}
+				active={matchPath(menu.path, $page.url.pathname)}
+			>
+				<span class="menu-name">{menu.name}</span>
+			</Menu>
+		{/each}
 	</div>
 
-	<div class="menu-list" />
-
-	{#if !hasUser}
+	{#if !$user}
 		<div class="btn-login-container">
 			<Button class="btn-login" on:click={handleLoginClick}>Login</Button>
 		</div>
@@ -78,6 +103,7 @@
 
 <style>
 	#top-navbar {
+		transition-duration: 2s;
 		position: sticky;
 		width: 100%;
 		box-sizing: border-box;
@@ -88,6 +114,21 @@
 		padding: 24px;
 		z-index: 5;
 		backdrop-filter: blur(5px);
+		transform: translateY(0%);
+	}
+
+	#top-navbar.hidden {
+		transform: translateY(-100%);
+	}
+
+	.menu-list {
+		display: flex;
+		width: 50%;
+	}
+
+	.menu-list .menu-name {
+		font-weight: bold;
+		font-size: 18px;
 	}
 
 	.btn-login-container,

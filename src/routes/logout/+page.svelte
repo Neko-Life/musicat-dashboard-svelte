@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { removeStorage } from '$lib/utils/localStorage';
+	import { removeLoggedInUser } from '$lib/utils/user';
 	import { onMount } from 'svelte';
 
 	let loader = 'Logging out...';
 
 	onMount(() => {
-		removeStorage('user');
+		removeLoggedInUser();
 		goto('/');
 	});
 

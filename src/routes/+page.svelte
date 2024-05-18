@@ -1,11 +1,9 @@
 <script lang="ts">
-	import Navbar from '$lib/components/Navbar.svelte';
 	import useGetMusicatUser from '$lib/queries/useGetMusicatUser';
 
-	const musicatUser = useGetMusicatUser();
+	let musicatUser: ReturnType<typeof useGetMusicatUser>;
+	$: musicatUser = useGetMusicatUser();
 </script>
-
-<Navbar />
 
 <div class="page-container">
 	<div class="avatar-container {$musicatUser.data?.data.avatar_url.length ? 'active' : ''}">
