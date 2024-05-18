@@ -1,23 +1,21 @@
 <script lang="ts">
 	import Navbar from '$lib/components/Navbar.svelte';
-	import { useQuery } from '@sveltestack/svelte-query';
-	import { getBotPreview } from '$lib/services/general';
+	import useGetMusicatUser from '$lib/hooks/useGetMusicatUser';
 
-	const botPreviewQueryId = 'get-bot-preview';
-	const botPreview = useQuery(botPreviewQueryId, getBotPreview);
+	const musicatUser = useGetMusicatUser();
 </script>
 
 <Navbar />
 
 <div class="page-container">
-	<div class="avatar-container {$botPreview.data?.data.avatar_url.length ? 'active' : ''}">
-		<img loading="lazy" src={$botPreview.data?.data.avatar_url} alt="" width="100%" />
+	<div class="avatar-container {$musicatUser.data?.data.avatar_url.length ? 'active' : ''}">
+		<img loading="lazy" src={$musicatUser.data?.data.avatar_url} alt="" width="100%" />
 	</div>
 
 	<div class="desc-container">
-		<h1>{$botPreview.data?.data.username || ''}</h1>
+		<h1>{$musicatUser.data?.data.username || ''}</h1>
 
-		<p>{$botPreview.data?.data.description || ''}</p>
+		<p>{$musicatUser.data?.data.description || ''}</p>
 	</div>
 </div>
 

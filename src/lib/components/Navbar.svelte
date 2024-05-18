@@ -6,6 +6,7 @@
 	import { getUserAvatarLink } from '$lib/utils/user';
 	import { onMount } from 'svelte';
 	import AvatarButton from './Navbar/AvatarButton.svelte';
+	import useGetMusicatUser from '$lib/hooks/useGetMusicatUser';
 
 	const successRedir = encodeURIComponent($page.url.pathname);
 
@@ -20,6 +21,8 @@
 	let hasUser = false;
 	let userAvatar: string | undefined;
 	let avatarDropdownClass: string = '';
+
+	const musicatUser = useGetMusicatUser();
 
 	onMount(() => {
 		const user = getStorage('user');
@@ -40,9 +43,22 @@
 	const handleAvatarClick = () => {
 		avatarDropdownClass = avatarDropdownClass.length ? '' : 'show';
 	};
+
+	const handleMusicatAvatarClick = () => {
+		// window.location.href=
+	};
 </script>
 
 <div id="top-navbar">
+	<div>
+		<AvatarButton
+			on:click={handleMusicatAvatarClick}
+			src={$musicatUser?.data?.data?.avatar_url}
+		/>
+	</div>
+
+	<div class="menu-list" />
+
 	{#if !hasUser}
 		<div class="btn-login-container">
 			<Button class="btn-login" on:click={handleLoginClick}>Login</Button>
@@ -62,15 +78,16 @@
 
 <style>
 	#top-navbar {
-		position: fixed;
+		position: sticky;
 		width: 100%;
 		box-sizing: border-box;
 		top: 0;
 		display: flex;
-		justify-content: flex-end;
+		justify-content: space-between;
 		align-items: center;
 		padding: 24px;
 		z-index: 5;
+		backdrop-filter: blur(5px);
 	}
 
 	.btn-login-container,

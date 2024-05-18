@@ -3,7 +3,7 @@ import type { IBotPreview, IUserGuild } from '$lib/interfaces/services/general';
 import { processResponse } from '$lib/utils/fetch';
 import { getAPIUrl } from '$lib/utils/services';
 
-export async function getBotPreview() {
+export async function getMusicatUser() {
 	const url = getAPIUrl('/');
 
 	const res = await fetch(url, {

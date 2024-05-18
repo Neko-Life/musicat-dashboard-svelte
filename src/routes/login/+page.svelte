@@ -43,6 +43,7 @@
 
 		postLogin({ code, state, redirect_uri: origin + '/login' })
 			.then((data) => {
+                                console.log({data});
 				if (!data.success) {
 					loader =
 						'Error while logging in: ' +

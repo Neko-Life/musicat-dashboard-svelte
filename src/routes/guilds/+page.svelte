@@ -15,7 +15,12 @@
 {:else}
 	<div class="page-container">
 		<div class="guild-list-container">
-			{#each $userGuilds.data?.data || [] as guild, i}
+			{#each $userGuilds.data?.data?.sort((a, b) => {
+				if (a.is_mutual && !b.is_mutual) return -1;
+				if (!a.is_mutual && b.is_mutual) return 1;
+
+				return 0;
+			}) || [] as guild, i}
 				<GuildCard {guild} />
 			{/each}
 		</div>
@@ -40,6 +45,6 @@
 		max-width: 1366px;
 		flex-wrap: wrap;
 		gap: 20px;
-		padding: 40px 20px;
+		padding: 0px 20px 40px 20px;
 	}
 </style>

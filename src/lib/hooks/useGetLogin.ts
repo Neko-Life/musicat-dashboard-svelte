@@ -13,6 +13,7 @@ export function getDefaultGetLoginSuccessHandler({
 	cb
 }: IGetDefaultGetLoginSuccessHandlerParams) {
 	return (r: IBaseAPIResponse<string>) => {
+		console.log({ r });
 		if (!r.success) {
 			console.error('getLogin.json');
 			return;
