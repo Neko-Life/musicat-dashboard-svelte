@@ -2,7 +2,7 @@
 	export let src: string | undefined;
 </script>
 
-<button class="avatar {$$props.class}" on:click>
+<button class="avatar {$$props.class || ''}" on:click>
 	<img loading="lazy" {src} alt="Avatar" />
 </button>
 

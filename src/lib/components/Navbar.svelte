@@ -71,7 +71,12 @@
 </script>
 
 <div id="top-navbar" class={hidden ? 'hidden' : ''}>
-	<AvatarButton on:click={handleMusicatAvatarClick} src={$musicatUser?.data?.data?.avatar_url} />
+	<div class="mc-av-container">
+		<AvatarButton
+			on:click={handleMusicatAvatarClick}
+			src={$musicatUser?.data?.data?.avatar_url}
+		/>
+	</div>
 
 	<div class="menu-list">
 		{#each menuList as menu}
@@ -129,6 +134,12 @@
 	.menu-list .menu-name {
 		font-weight: bold;
 		font-size: 18px;
+	}
+
+	.mc-av-container {
+		width: 115px;
+		display: flex;
+		align-items: center;
 	}
 
 	.btn-login-container,
