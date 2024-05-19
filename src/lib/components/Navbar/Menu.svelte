@@ -3,12 +3,14 @@
 	export let active: boolean | undefined;
 </script>
 
-<button class="menu-container {active ? 'active' : ''}" on:click>
+<button class="menu-container {$$props.class || ''} {active ? 'active' : ''}" on:click>
 	<!--
 	<div class="glow left" />
         -->
 	<div class="menu">
-		<slot />
+		<div class="menu-border">
+			<slot />
+		</div>
 	</div>
 	<!--
 	<div class="glow right" />
@@ -28,25 +30,50 @@
 
 	.menu-container * {
 		transition-duration: 0.5s;
+                transition-timing-function: ease-out;
 	}
 
 	.menu {
 		width: 100%;
 		cursor: pointer;
 		position: relative;
-		border: 10px solid transparent;
+                margin: 10px 0px 10px 0px;
+		border-top: 0px solid transparent;
+		border-bottom: 0px solid transparent;
+		border-left: 10px solid transparent;
+		border-right: 10px solid transparent;
 		border-color: transparent;
+	}
+
+	.menu-container:hover:not(.active) .menu {
+          border-left-color: white;
+          border-right-color: white;
+	}
+
+	.menu-container.active .menu,
+	.menu-container:active .menu {
+		box-shadow: inset 44px 0px 20px -25px white, inset -44px 0px 20px -25px white;
+	}
+
+	.menu-container.active .menu {
+		border-top: 10px solid white;
+		border-bottom: 10px solid white;
+                margin: 0px;
+	}
+
+	.menu-border {
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		padding: 8px 0px;
+		border-top: 1px solid;
+		border-bottom: 1px solid;
+		border-color: transparent;
 	}
 
-	.menu-container:hover .menu,
-	.menu-container.active .menu {
-		border-left-color: white;
-		border-right-color: white;
-		box-shadow: inset 44px 0px 20px -25px white, inset -44px 0px 20px -25px white;
+	.menu-container:hover .menu-border,
+	.menu-container.active .menu-border {
+		border-color: white;
 	}
 
 	.glow {

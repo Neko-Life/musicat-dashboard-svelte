@@ -2,10 +2,9 @@
 	import useGetMusicatUser from '$lib/queries/useGetMusicatUser';
 	import type { IBotPreview } from '$lib/interfaces/services/general';
 
-	let musicatUser: ReturnType<typeof useGetMusicatUser>;
+	const musicatUser = useGetMusicatUser();
 	let mcUser: IBotPreview | undefined;
 	$: {
-		musicatUser = useGetMusicatUser();
 		mcUser = $musicatUser?.data?.data;
 
 		if (mcUser?.username) {

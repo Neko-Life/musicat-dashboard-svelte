@@ -10,19 +10,19 @@
 	import useGetMusicatUser from '$lib/queries/useGetMusicatUser';
 	import { user } from '$lib/store';
 	import { matchPath } from '$lib/utils/url';
-
-	const successRedir = encodeURIComponent($page.url.pathname);
+	import LoginButton from './Buttons/LoginButton.svelte';
 
 	let avatarDropdownClass: string = '';
+	let mcAvatarDropdownClass: string = '';
+
+	const musicatUser = useGetMusicatUser();
 
 	let userAvatar: string | undefined;
-	let musicatUser: ReturnType<typeof useGetMusicatUser>;
+	let mcAvatar: string | undefined;
 	let loggedInMenus: { name: string; path: string }[];
 	let menuList: typeof loggedInMenus;
 
 	$: {
-		musicatUser = useGetMusicatUser();
-
 		if ($user) {
 			userAvatar = getUserAvatarLink({
 				userId: $user.id,
@@ -30,6 +30,10 @@
 				size: 64
 			});
 		} else userAvatar = undefined;
+
+		if ($musicatUser?.data?.data) {
+			mcAvatar = $musicatUser?.data?.data.avatar_url;
+		}
 
 		loggedInMenus = $user
 			? [
@@ -49,10 +53,6 @@
 		];
 	}
 
-	const handleLoginClick = () => {
-		goto('/login?redirect=' + successRedir);
-	};
-
 	const handleLogoutClick = () => {
 		goto('/logout');
 	};
@@ -62,8 +62,10 @@
 	};
 
 	const handleMusicatAvatarClick = () => {
-		// window.location.href=
+		mcAvatarDropdownClass = mcAvatarDropdownClass.length ? '' : 'show';
 	};
+
+	const handleInviteClick = () => {};
 
 	const handleMenuClick = (menu: (typeof menuList)[number]) => {
 		goto(menu.path);
@@ -71,11 +73,13 @@
 </script>
 
 <div id="top-navbar" class={hidden ? 'hidden' : ''}>
-	<div class="mc-av-container">
-		<AvatarButton
-			on:click={handleMusicatAvatarClick}
-			src={$musicatUser?.data?.data?.avatar_url}
-		/>
+	<div class="user-info-container">
+		<AvatarButton class="z-above" on:click={handleMusicatAvatarClick} src={mcAvatar} />
+		<div class="avatar-button-dropdown-container {mcAvatarDropdownClass}">
+			<div class="btn-logout-container">
+				<Button class="btn-login" on:click={handleInviteClick}>Invite</Button>
+			</div>
+		</div>
 	</div>
 
 	<div class="menu-list">
@@ -91,7 +95,7 @@
 
 	{#if !$user}
 		<div class="btn-login-container">
-			<Button class="btn-login" on:click={handleLoginClick}>Login</Button>
+			<LoginButton />
 		</div>
 	{:else}
 		<div class="user-info-container">
@@ -137,9 +141,9 @@
 	}
 
 	.mc-av-container {
-		width: 115px;
 		display: flex;
-		align-items: center;
+		gap: 8px;
+		width: 115px;
 	}
 
 	.btn-login-container,
@@ -148,7 +152,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		padding: 0px 24px;
+		/*padding: 0px 24px;*/
 		width: 115px;
 		box-sizing: border-box;
 	}

@@ -1,8 +1,7 @@
 <script lang="ts">
 	import useGetMusicatUser from '$lib/queries/useGetMusicatUser';
 
-	let musicatUser: ReturnType<typeof useGetMusicatUser>;
-	$: musicatUser = useGetMusicatUser();
+	const musicatUser = useGetMusicatUser();
 </script>
 
 <div class="page-container">

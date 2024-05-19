@@ -2,7 +2,7 @@
 	export let disabled: boolean = false;
 </script>
 
-<button class="btn {$$props.class}" on:click {disabled}>
+<button class="btn {$$props.class || ''}" on:click {disabled}>
 	<slot />
 </button>
 
@@ -13,9 +13,16 @@
 		border: 0;
 		border-radius: 8px;
 		cursor: pointer;
+		animation: scale-in 1s ease-out;
 	}
 
 	.btn:hover {
+		scale: 105%;
+		background-color: var(--default-btn-bg-color-hover);
+	}
+
+	.btn:active {
+		scale: 95%;
 		background-color: var(--default-btn-bg-color-hover);
 	}
 
@@ -23,5 +30,15 @@
 		padding: 8px 12px;
 		font-size: 16px;
 		box-shadow: 0px 0px 10px 1px rgba(255, 255, 255, 0.5);
+	}
+
+	@keyframes scale-in {
+		0% {
+			scale: 90%;
+		}
+
+		100% {
+			scale: 100%;
+		}
 	}
 </style>

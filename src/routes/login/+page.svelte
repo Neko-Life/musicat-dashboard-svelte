@@ -67,6 +67,7 @@
 
 	$: if ($loginQuery.data) {
 		handleGetLoginResponse($loginQuery.data);
+		loginQuery.setEnabled(false);
 	}
 </script>
 
