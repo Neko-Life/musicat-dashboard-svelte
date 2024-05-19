@@ -18,4 +18,7 @@
 	<RootHook />
 	<Navbar hidden={$hideNavbar} />
 	<slot />
+        <!--
+	<Pagination />
+        -->
 </QueryClientProvider>

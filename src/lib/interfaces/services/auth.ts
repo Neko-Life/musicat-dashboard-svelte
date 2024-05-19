@@ -27,3 +27,8 @@ export interface IPostLoginResponse {
 	redirect: string;
 	user: IUser;
 }
+
+export interface IPagination {
+	page: number;
+	maxPage: number;
+}

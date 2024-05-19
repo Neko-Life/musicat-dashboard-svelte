@@ -13,7 +13,9 @@
 
 	let guildList: IUserGuild[];
 	let guildListInPage: typeof guildList;
+	let guildListRows: (typeof guildList)[];
 	let maxPage = 1;
+	const perRow = 5;
 	$: {
 		guildList =
 			$userGuilds.data?.data?.sort((a, b) => {
@@ -27,6 +29,18 @@
 		guildListInPage = guildList.filter(
 			(_v, i) => i >= filterIndexes - perPage && i < filterIndexes
 		);
+		guildListRows = [];
+		const iter = Math.ceil(perPage / perRow);
+		for (let i = 0; i < iter; i++) {
+			const toP = [];
+			const startj = perRow * i;
+			for (let j = startj; j < startj + perRow; j++) {
+				const g = guildList[j];
+				if (!g) break;
+				toP.push(g);
+			}
+			guildListRows.push(toP);
+		}
 	}
 </script>
 
@@ -43,8 +57,12 @@
 
 	<div class="page-container">
 		<div class="guild-list-container">
-			{#each guildListInPage as guild, i}
-				<GuildCard {guild} />
+			{#each guildListRows as guildRow}
+				<div class="guild-row">
+					{#each guildRow as guild}
+						<GuildCard {guild} />
+					{/each}
+				</div>
 			{/each}
 		</div>
 	</div>
@@ -52,8 +70,7 @@
 
 <style>
 	.error-container,
-	.page-container,
-	.guild-list-container {
+	.page-container {
 		display: flex;
 		flex-grow: 1;
 		justify-content: center;
@@ -65,9 +82,16 @@
 	}
 
 	.guild-list-container {
-		max-width: 1366px;
-		flex-wrap: wrap;
-		gap: 20px;
+		width: 100%;
+		max-width: 1280px;
 		padding: 20px 20px 40px 20px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 40px;
+	}
+
+	.guild-row {
+		display: flex;
 	}
 </style>

@@ -11,6 +11,11 @@
 	import { user } from '$lib/store';
 	import { matchPath } from '$lib/utils/url';
 	import LoginButton from './Buttons/LoginButton.svelte';
+	import BarsSolid from '$lib/components/icons/BarsSolid.svelte';
+	import ArrowLeftSolid from './icons/ArrowLeftSolid.svelte';
+	import MenuMobile from './Navbar/MenuMobile.svelte';
+
+	let showMobileMenus = false;
 
 	let avatarDropdownClass: string = '';
 	let mcAvatarDropdownClass: string = '';
@@ -67,12 +72,17 @@
 
 	const handleInviteClick = () => {};
 
-	const handleMenuClick = (menu: (typeof menuList)[number]) => {
+	const handleMenuClick = (menu: (typeof menuList)[number], isMobile?: boolean) => {
 		goto(menu.path);
+		if (isMobile) handleMobileMenuBtnClick();
+	};
+
+	const handleMobileMenuBtnClick = () => {
+		showMobileMenus = !showMobileMenus;
 	};
 </script>
 
-<div id="top-navbar" class={hidden ? 'hidden' : ''}>
+<div id="top-navbar" class="bd-blur-5 {hidden ? 'hidden' : ''}">
 	<div class="user-info-container">
 		<AvatarButton class="z-above" on:click={handleMusicatAvatarClick} src={mcAvatar} />
 		<div class="avatar-button-dropdown-container {mcAvatarDropdownClass}">
@@ -83,14 +93,20 @@
 	</div>
 
 	<div class="menu-list">
-		{#each menuList as menu}
-			<Menu
-				on:click={() => handleMenuClick(menu)}
-				active={matchPath(menu.path, $page.url.pathname)}
-			>
-				<span class="menu-name">{menu.name}</span>
-			</Menu>
-		{/each}
+		<button class="mobile-menu-btn" on:click={handleMobileMenuBtnClick}>
+			<BarsSolid width={35} />
+		</button>
+
+		<div class="menu-items-container">
+			{#each menuList as menu}
+				<Menu
+					on:click={() => handleMenuClick(menu)}
+					active={matchPath(menu.path, $page.url.pathname)}
+				>
+					<span class="menu-name">{menu.name}</span>
+				</Menu>
+			{/each}
+		</div>
 	</div>
 
 	{#if !$user}
@@ -110,6 +126,25 @@
 	{/if}
 </div>
 
+{#if showMobileMenus}
+	<div class="mobile-menus">
+		<div class="mobile-menus-top" on:click={handleMobileMenuBtnClick}>
+			<ArrowLeftSolid width={40} />
+		</div>
+
+		<div class="mobile-menu-list-container">
+			{#each menuList as menu}
+				<MenuMobile
+					on:click={() => handleMenuClick(menu, true)}
+					active={matchPath(menu.path, $page.url.pathname)}
+				>
+					<span class="menu-name">{menu.name}</span>
+				</MenuMobile>
+			{/each}
+		</div>
+	</div>
+{/if}
+
 <style>
 	#top-navbar {
 		transition-duration: 2s;
@@ -122,22 +157,11 @@
 		align-items: center;
 		padding: 24px;
 		z-index: 5;
-		backdrop-filter: blur(5px);
 		transform: translateY(0%);
 	}
 
 	#top-navbar.hidden {
 		transform: translateY(-100%);
-	}
-
-	.menu-list {
-		display: flex;
-		width: 50%;
-	}
-
-	.menu-list .menu-name {
-		font-weight: bold;
-		font-size: 18px;
 	}
 
 	.mc-av-container {
@@ -182,5 +206,78 @@
 		opacity: 1;
 		visibility: visible;
 		transform: translateY(0%);
+	}
+
+	.mobile-menus {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+		z-index: 100;
+		background-color: black;
+	}
+
+	.mobile-menus-top {
+		padding: 16px 24px;
+		border-bottom: 1px solid blue;
+		box-shadow: 0px 0px 50px 0px blue;
+	}
+
+	.mobile-menu-list-container {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.menu-list {
+		flex-grow: 1;
+	}
+
+	.menu-items-container {
+		display: none;
+		width: 100%;
+	}
+
+	.mobile-menu-btn {
+		background-color: transparent;
+		outline: none;
+		border: none;
+		border-radius: 6px;
+		padding: 4px 8px;
+		border: 1px solid transparent;
+	}
+
+	.mobile-menu-btn:active,
+	.mobile-menu-btn:hover,
+	.mobile-menu-btn:focus {
+		border: 1px solid white;
+	}
+
+	@media (max-width: 720px) {
+		#top-navbar {
+			padding: 12px 0px;
+		}
+	}
+
+	@media (min-width: 600px) {
+		.menu-list,
+		.menu-items-container {
+			display: flex;
+		}
+
+		.mobile-menu-btn {
+			display: none;
+		}
+	}
+
+	@media (min-width: 900px) {
+		.menu-list {
+			max-width: 1024px;
+		}
+	}
+
+	.menu-list .menu-name {
+		font-weight: bold;
+		font-size: 18px;
 	}
 </style>

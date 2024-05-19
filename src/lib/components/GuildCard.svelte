@@ -29,17 +29,40 @@
 	.guild-card-container {
 		padding: 20px;
 		box-sizing: border-box;
-		width: 200px;
 		display: flex;
 		flex-direction: column;
 		gap: 20px;
 		transition-duration: 0.5s;
 		cursor: pointer;
-
+		width: 100px;
 		border: 0;
 		background-color: transparent;
 		outline: none;
-                align-items: center;
+		align-items: center;
+	}
+
+	@media (min-width: 480px) {
+		.guild-card-container {
+			width: 100px;
+		}
+	}
+
+	@media (min-width: 720px) {
+		.guild-card-container {
+			width: 120px;
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.guild-card-container {
+			width: 140px;
+		}
+	}
+
+	@media (min-width: 1366px) {
+		.guild-card-container {
+			width: 200px;
+		}
 	}
 
 	.guild-card-container:hover {

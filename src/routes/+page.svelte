@@ -36,8 +36,22 @@
 		border-radius: 100%;
 		overflow: hidden;
 		box-shadow: 0px 0px 200px 10px rgba(255, 255, 255, 0.4);
-		width: 256px;
-		height: 256px;
+		width: 128px;
+		height: 128px;
+	}
+
+	@media (min-width: 480px) {
+		.avatar-container.active {
+			width: 192px;
+			height: 192px;
+		}
+	}
+
+	@media (min-width: 720px) {
+		.avatar-container.active {
+			width: 256px;
+			height: 256px;
+		}
 	}
 
 	.avatar-container img {

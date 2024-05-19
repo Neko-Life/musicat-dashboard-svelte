@@ -1,0 +1,34 @@
+<script lang="ts">
+	// export let src: string | undefined;
+	export let active: boolean | undefined;
+</script>
+
+<button class="menu-container {$$props.class || ''} {active ? 'active' : ''}" on:click>
+	<!--
+	<div class="glow left" />
+        -->
+	<div class="menu">
+		<slot />
+	</div>
+	<!--
+	<div class="glow right" />
+        -->
+</button>
+
+<style>
+	.menu-container {
+		display: flex;
+		flex: 1;
+		align-items: center;
+		background-color: transparent;
+		outline: none;
+		border: none;
+		font-size: 28px;
+		padding: 16px 24px;
+		transition-duration: 0.2s;
+	}
+
+	.menu-container:active {
+		box-shadow: inset 10px 0px 40px -10px blue, inset -10px 0px 40px -10px blue;
+	}
+</style>

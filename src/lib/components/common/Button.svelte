@@ -28,8 +28,13 @@
 
 	.btn-login {
 		padding: 8px 12px;
-		font-size: 16px;
 		box-shadow: 0px 0px 10px 1px rgba(255, 255, 255, 0.5);
+	}
+
+	@media (min-width: 480px) {
+		.btn-login {
+			font-size: 16px;
+		}
 	}
 
 	@keyframes scale-in {
