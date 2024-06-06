@@ -1,74 +1,40 @@
 <script lang="ts">
 	import { pagination } from '$lib/store';
-	import type { KeyboardEventHandler } from 'svelte/elements';
-	import Button from './common/Button.svelte';
+	import PaginationButton from './Pagination/PaginationButton.svelte';
 
-	let inputPage = false;
-	let inputPageValue = '';
-	const handlePaginationClick = (page: number) => {
-		if (!$pagination) return;
-
-		if ($pagination.page !== page) {
-			$pagination.page = page;
-			return;
+	const handlePrevPage = () => {
+		if ($pagination) {
+			if ($pagination.page > 1) {
+				$pagination.page--;
+			}
 		}
 
-		inputPage = true;
+		return 1 as const;
 	};
 
-	const handleInputPageKeydown: KeyboardEventHandler<HTMLInputElement> = (e) => {
-		if (['Enter'].includes(e.key)) {
-			// submit
-			if (!$pagination) return;
-
-			const pageN = inputPageValue?.length > 0 ? parseInt(inputPageValue) : NaN;
-			if (Number.isNaN(pageN) || pageN < 1 || pageN > $pagination.maxPage) return;
-
-			$pagination.page = pageN;
-
-			resetInputPage();
-		} else if (['Escape', 'Meta'].includes(e.key)) {
-			resetInputPage();
+	const handleNextPage = () => {
+		if ($pagination) {
+			if ($pagination.page < $pagination.maxPage) {
+				$pagination.page++;
+			}
 		}
-	};
 
-	const resetInputPage = () => {
-		inputPageValue = '';
-		inputPage = false;
+		return 1 as const;
 	};
 </script>
 
 {#if $pagination?.maxPage !== undefined}
 	<div class="pagination-container">
 		<div class="pagination">
-			<div>{'<'}</div>
+			<PaginationButton onPageClick={handlePrevPage} index={-1}>{'<'}</PaginationButton>
 			<div class="pagination-buttons-container">
 				{#each Array($pagination.maxPage) as _, i}
 					{#key i}
-						<div class="pagination-button">
-							{#if $pagination.page === i + 1 && inputPage}
-								<div class="btn input-container default-inp">
-									<input
-										class="input-page"
-										on:keydown={handleInputPageKeydown}
-										on:blur={resetInputPage}
-										bind:value={inputPageValue}
-										autofocus
-									/>
-								</div>
-							{/if}
-
-							<Button
-								class="pagination{$pagination.page === i + 1 ? ' active' : ''}"
-								on:click={() => handlePaginationClick(i + 1)}
-							>
-								{i + 1}
-							</Button>
-						</div>
+						<PaginationButton index={i} />
 					{/key}
 				{/each}
 			</div>
-			<div>{'>'}</div>
+			<PaginationButton onPageClick={handleNextPage} index={-1}>{'>'}</PaginationButton>
 		</div>
 	</div>
 {/if}
@@ -89,32 +55,5 @@
 	.pagination-buttons-container {
 		display: grid;
 		grid-auto-columns: 1fr;
-	}
-
-	.pagination-button {
-		grid-row: 1;
-		position: relative;
-	}
-
-	.input-page {
-		max-width: 100%;
-		box-sizing: border-box;
-		font-size: 14px;
-		max-height: 100%;
-		height: 100%;
-		padding: 0px 8px;
-	}
-
-	.input-container {
-		max-width: 50px;
-		transform: translateX(-50%);
-		left: 55%;
-		box-sizing: border-box;
-		position: absolute;
-		display: flex;
-		max-height: 100%;
-		height: 100%;
-		scale: 105%;
-		z-index: 1;
 	}
 </style>

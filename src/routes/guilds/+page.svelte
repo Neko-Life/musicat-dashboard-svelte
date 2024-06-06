@@ -83,14 +83,17 @@
 	}
 
 	.error-container {
+		display: flex;
 		align-items: center;
 		font-size: 36px;
+		justify-content: center;
 	}
 
 	.content {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		height: 100%;
 	}
 
 	.top-content {
