@@ -6,7 +6,9 @@ export async function getJson(res: Response) {
 	return;
 }
 
-export async function processResponse<T>(res: Response) {
+export async function processResponse<T>(res?: Response): Promise<T | undefined> {
+	if (res === undefined) return;
+
 	if (!res.ok) throw res;
 
 	const json: T = await getJson(res);

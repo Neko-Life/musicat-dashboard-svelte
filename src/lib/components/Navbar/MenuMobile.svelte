@@ -23,12 +23,15 @@
 		background-color: transparent;
 		outline: none;
 		border: none;
-		font-size: 28px;
 		padding: 16px 24px;
 		transition-duration: 0.2s;
 	}
 
 	.menu-container:active {
 		box-shadow: inset 10px 0px 40px -10px blue, inset -10px 0px 40px -10px blue;
+	}
+
+	.menu {
+		font-size: 28px;
 	}
 </style>

@@ -1,3 +1,5 @@
+export type IFetchParameters = Parameters<typeof fetch>;
+
 export interface IBotPreview {
 	username: string;
 	avatar_url: string;

@@ -44,8 +44,7 @@
 
 		postLogin({ code, state, redirect_uri: origin + '/login' })
 			.then((data) => {
-				console.log({ data });
-				if (!data.success) {
+				if (!data?.success) {
 					loader =
 						'Error while logging in: ' +
 						(data as unknown as IBaseAPIResponse<IErrorPayload>).data.code;

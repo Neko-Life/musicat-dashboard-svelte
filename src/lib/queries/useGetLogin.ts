@@ -5,6 +5,7 @@ import type {
 } from '$lib/interfaces/queries/useGetLogin';
 import type { IBaseAPIResponse } from '$lib/interfaces/services';
 import { getLogin } from '$lib/services/auth';
+import { createLoginRedirectParam } from '$lib/utils/url';
 import { useQuery } from '@sveltestack/svelte-query';
 
 export function getDefaultGetLoginSuccessHandler({
@@ -19,7 +20,7 @@ export function getDefaultGetLoginSuccessHandler({
 			return;
 		}
 
-		const redir = '&redirect=' + encodeURIComponent(origin + '/login');
+		const redir = '&' + createLoginRedirectParam(origin + '/login');
 
 		const g = r.data + redir;
 

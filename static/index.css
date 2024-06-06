@@ -40,6 +40,37 @@ button {
 	color: var(--default-button-text-color);
 }
 
+.btn {
+	background-color: var(--default-btn-bg-color);
+	transition-duration: 0.2s;
+	border: 0;
+	border-radius: 8px;
+	cursor: pointer;
+	animation: scale-in 1s ease-out;
+}
+
+.btn:hover {
+	scale: 105%;
+	background-color: var(--default-btn-bg-color-hover);
+}
+
+.btn:active {
+	scale: 95%;
+	background-color: var(--default-btn-bg-color-hover);
+}
+
+.default-inp input {
+	min-width: 0;
+	flex-grow: 1;
+	background-color: white;
+	color: black;
+	outline: none;
+	border: 1px solid gray;
+	border-radius: 6px;
+	padding: 4px 8px;
+	font-size: 18px;
+}
+
 .full-page {
 	width: 100vw;
 	height: 100vh;
@@ -56,12 +87,15 @@ button {
 }
 
 @media (max-width: 480px) {
+	p,
+	div {
+		font-size: 12px;
+	}
+}
+
+@media (max-width: 600px) {
 	h1 {
 		font-size: 24px;
-	}
-
-	p {
-		font-size: 12px;
 	}
 }
 

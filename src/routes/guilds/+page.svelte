@@ -2,78 +2,84 @@
 	import GuildCard from '$lib/components/GuildCard.svelte';
 	import type { IUserGuild } from '$lib/interfaces/services/general';
 	import useGetUserGuilds from '$lib/queries/useGetUserGuilds';
-	import { user } from '$lib/store';
+	import { user, pagination } from '$lib/store';
+	import { onMount } from 'svelte';
 
-	let page = 1;
+	let search = '';
 	const perPage = 10;
-	const filterIndexes = perPage * page;
 
 	const userGuilds = useGetUserGuilds({ enabled: !!$user });
 	$: userGuilds.setEnabled(!!$user);
 
 	let guildList: IUserGuild[];
 	let guildListInPage: typeof guildList;
-	let guildListRows: (typeof guildList)[];
-	let maxPage = 1;
-	const perRow = 5;
 	$: {
+		if (!$pagination) {
+			$pagination = {
+				page: 1,
+				maxPage: 1
+			};
+		}
+
+		const filterIndexes = perPage * $pagination.page;
+		const searchLowCase = search.toLocaleLowerCase();
+
 		guildList =
-			$userGuilds.data?.data?.sort((a, b) => {
-				if (a.is_mutual && !b.is_mutual) return -1;
-				if (!a.is_mutual && b.is_mutual) return 1;
+			$userGuilds.data?.data
+				?.filter((v) =>
+					search.length ? v.name.toLocaleLowerCase().includes(searchLowCase) : true
+				)
+				.sort((a, b) => {
+					if (a.is_mutual && !b.is_mutual) return -1;
+					if (!a.is_mutual && b.is_mutual) return 1;
 
-				return 0;
-			}) || [];
+					return 0;
+				}) || [];
 
-		maxPage = (guildList.length && Math.ceil(guildList.length / perPage)) || 1;
+		$pagination.maxPage = (guildList.length && Math.ceil(guildList.length / perPage)) || 1;
 		guildListInPage = guildList.filter(
 			(_v, i) => i >= filterIndexes - perPage && i < filterIndexes
 		);
-		guildListRows = [];
-		const iter = Math.ceil(perPage / perRow);
-		for (let i = 0; i < iter; i++) {
-			const toP = [];
-			const startj = perRow * i;
-			for (let j = startj; j < startj + perRow; j++) {
-				const g = guildList[j];
-				if (!g) break;
-				toP.push(g);
-			}
-			guildListRows.push(toP);
-		}
 	}
+
+	onMount(() => () => {
+		$pagination = undefined;
+	});
 </script>
 
-{#if !$user}
-	<div class="error-container login-container">You're not logged in</div>
-{:else if $userGuilds.isError}
-	<div class="error-container">Error getting guilds</div>
-{:else if $userGuilds.isLoading}
-	<div class="error-container">Loading...</div>
-{:else}
-	<div class="flex-center">
-		<h1>My Server List</h1>
-	</div>
+<div class="flex-center top-section">
+	<h1>My Server List</h1>
+</div>
 
-	<div class="page-container">
-		<div class="guild-list-container">
-			{#each guildListRows as guildRow}
-				<div class="guild-row">
-					{#each guildRow as guild}
-						<GuildCard {guild} />
-					{/each}
+<div class="page-container">
+	<div class="content">
+		{#if !$user}
+			<div class="error-container login-container">You're not logged in</div>
+		{:else if $userGuilds.isError}
+			<div class="error-container">Error getting guilds</div>
+		{:else if $userGuilds.isLoading}
+			<div class="error-container">Loading...</div>
+		{:else}
+			<div class="top-content">
+				<div class="input-container default-inp">
+					<input bind:value={search} />
 				</div>
-			{/each}
-		</div>
+			</div>
+			<div class="guild-list-container">
+				{#each guildListInPage as guild}
+					{#key guild.id}
+						<GuildCard {guild} />
+					{/key}
+				{/each}
+			</div>
+		{/if}
 	</div>
-{/if}
+</div>
 
 <style>
 	.error-container,
 	.page-container {
-		display: flex;
 		flex-grow: 1;
-		justify-content: center;
 	}
 
 	.error-container {
@@ -81,17 +87,64 @@
 		font-size: 36px;
 	}
 
+	.content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.top-content {
+		width: 100%;
+		padding-top: 12px;
+		max-width: 1280px;
+	}
+
+	.input-container {
+		padding: 4px 12px;
+		display: flex;
+		box-sizing: border-box;
+		max-width: 200px;
+	}
+
 	.guild-list-container {
 		width: 100%;
 		max-width: 1280px;
 		padding: 20px 20px 40px 20px;
-		display: flex;
-		flex-direction: column;
+		display: grid;
 		align-items: center;
-		gap: 40px;
+		gap: 0px;
+		justify-items: center;
+		align-content: start;
+		grid-template-columns: repeat(3, 1fr);
+		box-sizing: border-box;
 	}
 
-	.guild-row {
-		display: flex;
+	.top-section {
+		position: relative;
+	}
+
+	@media (min-width: 480px) {
+		.guild-list-container {
+			grid-template-columns: repeat(4, 1fr);
+		}
+	}
+
+	@media (min-width: 720px) {
+		.guild-list-container {
+			grid-template-columns: repeat(5, 1fr);
+			gap: 8px;
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.guild-list-container {
+			gap: 20px;
+		}
+	}
+
+	@media (min-width: 1366px) {
+		.guild-list-container {
+			gap: 40px;
+		}
 	}
 </style>

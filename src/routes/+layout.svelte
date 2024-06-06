@@ -5,6 +5,7 @@
 	import { hideNavbar, updateUser } from '$lib/store';
 	import { onMount } from 'svelte';
 	import RootHook from '$lib/components/RootHook.svelte';
+	import Pagination from '$lib/components/Pagination.svelte';
 
 	// load user from local storage
 	onMount(() => {
@@ -18,7 +19,5 @@
 	<RootHook />
 	<Navbar hidden={$hideNavbar} />
 	<slot />
-        <!--
 	<Pagination />
-        -->
 </QueryClientProvider>

@@ -1,37 +1,59 @@
 <script lang="ts">
 	import type { IUserGuild } from '$lib/interfaces/services/general';
 	import { getGuildIconLink } from '$lib/utils/guild';
+	import { onMount } from 'svelte';
 
-	export let guild: IUserGuild | undefined;
+	export let guild: IUserGuild;
+
+	let src: string | undefined;
+	let classNames: string;
+	$: {
+		src = guild
+			? getGuildIconLink({ guildId: guild.id, hash: guild.icon, size: 128 })
+			: undefined;
+
+		classNames = !guild?.is_mutual ? 'non-mutual' : '';
+	}
+
+	let shouldSlide = false;
+
+	let descriptionContainerEl: HTMLDivElement;
+	let descriptionTextEl: HTMLDivElement;
+
+	onMount(() => {
+		if (descriptionContainerEl.clientWidth >= descriptionTextEl.clientWidth) return;
+
+		shouldSlide = true;
+
+		return () => (shouldSlide = false);
+	});
 </script>
 
-{#if guild}
-	<button class="guild-card-container">
-		<div class="img-container">
-			<img
-				class={!guild?.is_mutual ? 'non-mutual' : ''}
-				loading="lazy"
-				src={getGuildIconLink({ guildId: guild.id, hash: guild.icon, size: 128 })}
-				alt="Guild Icon"
-			/>
-		</div>
-		<div class="guild-card-description-container">
-			<div class="guild-card-description">
-				<div class="guild-card-description-text" title={guild.name}>
-					{guild.name}
-				</div>
+<button class="guild-card-container">
+	<div class="img-container">
+		<img class={classNames} loading="lazy" {src} alt="Guild Icon" />
+	</div>
+
+	<div bind:this={descriptionContainerEl} class="guild-card-description-container">
+		<div class="guild-card-description{shouldSlide ? ' slide' : ''}">
+			<div
+				bind:this={descriptionTextEl}
+				class="guild-card-description-text"
+				title={guild.name}
+			>
+				{guild.name}
 			</div>
 		</div>
-	</button>
-{/if}
+	</div>
+</button>
 
 <style>
 	.guild-card-container {
-		padding: 20px;
+		padding: 8px;
 		box-sizing: border-box;
 		display: flex;
 		flex-direction: column;
-		gap: 20px;
+		gap: 0px;
 		transition-duration: 0.5s;
 		cursor: pointer;
 		width: 100px;
@@ -39,30 +61,6 @@
 		background-color: transparent;
 		outline: none;
 		align-items: center;
-	}
-
-	@media (min-width: 480px) {
-		.guild-card-container {
-			width: 100px;
-		}
-	}
-
-	@media (min-width: 720px) {
-		.guild-card-container {
-			width: 120px;
-		}
-	}
-
-	@media (min-width: 1024px) {
-		.guild-card-container {
-			width: 140px;
-		}
-	}
-
-	@media (min-width: 1366px) {
-		.guild-card-container {
-			width: 200px;
-		}
 	}
 
 	.guild-card-container:hover {
@@ -114,23 +112,74 @@
 
 	.guild-card-description {
 		position: relative;
-		animation: text-container-slide 10s ease-in-out infinite alternate;
 		width: 100%;
 	}
 
 	.guild-card-description-text {
 		text-align: center;
 		max-height: 48px;
-		font-size: 18px;
 		font-weight: 600;
 		white-space: nowrap;
 		min-width: 100%;
 		width: fit-content;
 		position: absolute;
+	}
+
+	.guild-card-description.slide {
+		animation: text-container-slide 10s ease-in-out infinite alternate;
+	}
+
+	.guild-card-description.slide .guild-card-description-text {
 		animation: text-slide 10s ease-in-out infinite alternate;
 	}
 
 	img.non-mutual {
 		filter: grayscale(90%);
+	}
+
+	@media (min-width: 480px) {
+		.guild-card-container {
+			width: 100px;
+		}
+	}
+
+	@media (min-width: 720px) {
+		.guild-card-container {
+			width: 120px;
+			gap: 10px;
+			padding: 12px;
+		}
+
+		.guild-card-description-text {
+			font-size: 14px;
+		}
+	}
+
+	@media (min-width: 900px) {
+		.guild-card-container {
+			width: 160px;
+		}
+
+		.guild-card-description-text {
+			font-size: 18px;
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.guild-card-container {
+			gap: 16px;
+		}
+	}
+
+	@media (min-width: 1280px) {
+		.guild-card-container {
+			width: 180px;
+		}
+	}
+
+	@media (min-width: 1366px) {
+		.guild-card-container {
+			width: 180px;
+		}
 	}
 </style>
