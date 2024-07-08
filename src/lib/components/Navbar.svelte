@@ -14,6 +14,7 @@
 	import BarsSolid from '$lib/components/icons/BarsSolid.svelte';
 	import ArrowLeftSolid from './icons/ArrowLeftSolid.svelte';
 	import MenuMobile from './Navbar/MenuMobile.svelte';
+	import OuterClick from './Hooks/OuterClick.svelte';
 
 	let showMobileMenus = false;
 
@@ -84,12 +85,16 @@
 
 <div id="top-navbar" class="bd-blur-5 {hidden ? 'hidden' : ''}">
 	<div class="user-info-container">
-		<AvatarButton class="z-above" on:click={handleMusicatAvatarClick} src={mcAvatar} />
-		<div class="avatar-button-dropdown-container {mcAvatarDropdownClass}">
-			<div class="btn-logout-container">
-				<Button class="btn-login" on:click={handleInviteClick}>Invite</Button>
+		<OuterClick
+			onOuterClick={mcAvatarDropdownClass.length ? handleMusicatAvatarClick : undefined}
+		>
+			<AvatarButton class="z-above" on:click={handleMusicatAvatarClick} src={mcAvatar} />
+			<div class="avatar-button-dropdown-container {mcAvatarDropdownClass}">
+				<div class="btn-logout-container">
+					<Button class="btn-login" on:click={handleInviteClick}>Invite</Button>
+				</div>
 			</div>
-		</div>
+		</OuterClick>
 	</div>
 
 	<div class="menu-list">
@@ -115,13 +120,15 @@
 		</div>
 	{:else}
 		<div class="user-info-container">
-			<AvatarButton class="z-above" on:click={handleAvatarClick} src={userAvatar} />
+			<OuterClick onOuterClick={avatarDropdownClass.length ? handleAvatarClick : undefined}>
+				<AvatarButton class="z-above" on:click={handleAvatarClick} src={userAvatar} />
 
-			<div class="avatar-button-dropdown-container {avatarDropdownClass}">
-				<div class="btn-logout-container">
-					<Button class="btn-login" on:click={handleLogoutClick}>Logout</Button>
+				<div class="avatar-button-dropdown-container {avatarDropdownClass}">
+					<div class="btn-logout-container">
+						<Button class="btn-login" on:click={handleLogoutClick}>Logout</Button>
+					</div>
 				</div>
-			</div>
+			</OuterClick>
 		</div>
 	{/if}
 </div>

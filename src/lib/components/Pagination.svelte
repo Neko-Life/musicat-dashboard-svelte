@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { pagination } from '$lib/store';
 	import PaginationButton from './Pagination/PaginationButton.svelte';
+	import ArrowLeftSolid from './icons/ArrowLeftSolid.svelte';
 
 	const handlePrevPage = () => {
 		if ($pagination) {
@@ -26,15 +27,23 @@
 {#if $pagination?.maxPage !== undefined}
 	<div class="pagination-container">
 		<div class="pagination">
-			<PaginationButton onPageClick={handlePrevPage} index={-1}>{'<'}</PaginationButton>
 			<div class="pagination-buttons-container">
+				<PaginationButton onPageClick={handlePrevPage} index={-1}
+					><ArrowLeftSolid fill="black" height={24} /></PaginationButton
+				>
 				{#each Array($pagination.maxPage) as _, i}
 					{#key i}
 						<PaginationButton index={i} />
 					{/key}
 				{/each}
+				<PaginationButton onPageClick={handleNextPage} index={-1}
+					><ArrowLeftSolid
+						fill="black"
+						class="arr-rotate"
+						height={24}
+					/></PaginationButton
+				>
 			</div>
-			<PaginationButton onPageClick={handleNextPage} index={-1}>{'>'}</PaginationButton>
 		</div>
 	</div>
 {/if}
@@ -49,6 +58,7 @@
 	}
 
 	.pagination {
+		max-height: 24px;
 		display: flex;
 	}
 

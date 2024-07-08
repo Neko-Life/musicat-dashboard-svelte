@@ -46,6 +46,9 @@ button {
 	border: 0;
 	border-radius: 8px;
 	cursor: pointer;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	animation: scale-in 1s ease-out;
 }
 
@@ -84,6 +87,10 @@ button {
 
 .bd-blur-5 {
 	backdrop-filter: blur(5px);
+}
+
+.arr-rotate {
+	rotate: 180deg;
 }
 
 @media (max-width: 480px) {
