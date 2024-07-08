@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { MouseEventHandler } from 'svelte/elements';
 
-	export let onOuterClick: MouseEventHandler<HTMLDivElement> | undefined;
+	export let onOuterClick: ((e: MouseEvent) => void) | undefined;
 
 	let containerEl: HTMLDivElement;
 
@@ -17,7 +16,7 @@
 			return;
 		}
 
-		onOuterClick?.(e as MouseEvent & { currentTarget: EventTarget & HTMLDivElement });
+		onOuterClick?.(e);
 	};
 
 	onMount(() => {
