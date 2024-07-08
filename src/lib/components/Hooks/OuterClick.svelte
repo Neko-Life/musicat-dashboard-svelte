@@ -24,7 +24,9 @@
 		document.body.addEventListener('click', handler);
 
 		// unmount handler
-		return () => {};
+		return () => {
+			document.body.removeEventListener('click', handler);
+		};
 	});
 </script>
 
