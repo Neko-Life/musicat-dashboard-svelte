@@ -7,8 +7,8 @@ import type {
 import { processResponse } from '$lib/utils/fetch';
 import { getAPIUrl } from '$lib/utils/services';
 
-export async function getLogin({ headerRedirect }: IGetLoginParams = {}) {
-	const url = getAPIUrl('/login');
+export async function getLogin({ headerRedirect, isInvite }: IGetLoginParams = {}) {
+	const url = getAPIUrl(isInvite ? '/invite' : '/login');
 
 	const headers: [string, string][] = [];
 

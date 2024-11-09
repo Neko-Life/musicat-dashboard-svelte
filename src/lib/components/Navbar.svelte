@@ -9,7 +9,7 @@
 	import Menu from './Navbar/Menu.svelte';
 	import useGetMusicatUser from '$lib/queries/useGetMusicatUser';
 	import { user } from '$lib/store';
-	import { matchPath } from '$lib/utils/url';
+	import { createLoginRedirectParam, matchPath } from '$lib/utils/url';
 	import LoginButton from './Buttons/LoginButton.svelte';
 	import BarsSolid from '$lib/components/icons/BarsSolid.svelte';
 	import ArrowLeftSolid from './icons/ArrowLeftSolid.svelte';
@@ -71,7 +71,9 @@
 		mcAvatarDropdownClass = mcAvatarDropdownClass.length ? '' : 'show';
 	};
 
-	const handleInviteClick = () => {};
+	const handleInviteClick = () => {
+		goto('/login?' + createLoginRedirectParam($page.url.pathname) + '&invite=1');
+	};
 
 	const handleMenuClick = (menu: (typeof menuList)[number], isMobile?: boolean) => {
 		goto(menu.path);
@@ -87,13 +89,15 @@
 	<div class="user-info-container">
 		<OuterClick
 			onOuterClick={mcAvatarDropdownClass.length ? handleMusicatAvatarClick : undefined}
+			class="flexcolg0"
 		>
-			<AvatarButton class="z-above" on:click={handleMusicatAvatarClick} src={mcAvatar} />
 			<div class="avatar-button-dropdown-container {mcAvatarDropdownClass}">
 				<div class="btn-logout-container">
 					<Button class="btn-login" on:click={handleInviteClick}>Invite</Button>
 				</div>
 			</div>
+
+			<AvatarButton on:click={handleMusicatAvatarClick} src={mcAvatar} />
 		</OuterClick>
 	</div>
 
@@ -120,14 +124,17 @@
 		</div>
 	{:else}
 		<div class="user-info-container">
-			<OuterClick onOuterClick={avatarDropdownClass.length ? handleAvatarClick : undefined}>
-				<AvatarButton class="z-above" on:click={handleAvatarClick} src={userAvatar} />
-
+			<OuterClick
+				onOuterClick={avatarDropdownClass.length ? handleAvatarClick : undefined}
+				class="flexcolg0"
+			>
 				<div class="avatar-button-dropdown-container {avatarDropdownClass}">
 					<div class="btn-logout-container">
 						<Button class="btn-login" on:click={handleLogoutClick}>Logout</Button>
 					</div>
 				</div>
+
+				<AvatarButton on:click={handleAvatarClick} src={userAvatar} />
 			</OuterClick>
 		</div>
 	{/if}
@@ -135,7 +142,7 @@
 
 {#if showMobileMenus}
 	<div class="mobile-menus">
-		<div class="mobile-menus-top" on:click={handleMobileMenuBtnClick}>
+		<div class="mobile-menus-top" role="button" on:click={handleMobileMenuBtnClick}>
 			<ArrowLeftSolid width={40} />
 		</div>
 

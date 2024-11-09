@@ -11,7 +11,8 @@
 
 	let loginQuery: ReturnType<typeof useGetLogin>;
 	$: loginQuery = useGetLogin({
-		successRedirect: successRedir
+		successRedirect: successRedir,
+		isInvite: $page.url.searchParams.get('invite') === '1'
 	});
 
 	const origin = $page.url.origin;

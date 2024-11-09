@@ -1,5 +1,6 @@
 export interface IGetLoginParams {
 	headerRedirect?: string;
+        isInvite?: boolean;
 }
 
 export interface IPostLoginData {

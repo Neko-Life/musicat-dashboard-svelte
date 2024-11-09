@@ -32,3 +32,11 @@
 <div bind:this={containerEl} {...$$props}>
 	<slot />
 </div>
+
+<style>
+	.flexcolg0 {
+		display: flex;
+		flex-direction: column;
+		gap: 0px;
+	}
+</style>

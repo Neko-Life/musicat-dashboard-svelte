@@ -30,8 +30,12 @@ export function getDefaultGetLoginSuccessHandler({
 	};
 }
 
-export default function useGetLogin({ successRedirect }: IUseGetLoginParams) {
-	return useQuery(getLoginQueryId, () => getLogin({ headerRedirect: successRedirect }), {
-		enabled: false
-	});
+export default function useGetLogin({ successRedirect, isInvite }: IUseGetLoginParams) {
+	return useQuery(
+		getLoginQueryId + (isInvite ? '-invite' : ''),
+		() => getLogin({ headerRedirect: successRedirect, isInvite }),
+		{
+			enabled: false
+		}
+	);
 }
