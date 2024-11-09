@@ -202,6 +202,7 @@
 
 	.user-info-container {
 		flex-direction: column;
+		position: relative;
 	}
 
 	.avatar-button-dropdown-container {
@@ -210,16 +211,16 @@
 	}
 
 	.avatar-button-dropdown-container .btn-logout-container {
-		transition: opacity 0.5s ease-in, transform 0.5s ease-out, visibility 0.5s ease-out;
+		transition: opacity 0.5s ease-in, top 0.5s ease-out, visibility 0.5s ease-out;
 		opacity: 0;
 		visibility: hidden;
-		transform: translateY(-100%);
+		top: 0;
 	}
 
 	.avatar-button-dropdown-container.show .btn-logout-container {
 		opacity: 1;
 		visibility: visible;
-		transform: translateY(0%);
+		top: 100%;
 	}
 
 	.mobile-menus {
