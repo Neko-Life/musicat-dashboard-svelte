@@ -110,6 +110,10 @@
 		position: relative;
 	}
 
+	.guild-card-container:hover .guild-card-description-container {
+		overflow: visible;
+        }
+
 	.guild-card-description {
 		position: relative;
 		width: 100%;
@@ -124,6 +128,10 @@
 		width: fit-content;
 		position: absolute;
 	}
+
+	.guild-card-container:hover .guild-card-description-text {
+                text-shadow: var(--default-text-color) 0px 0px 20px;
+        }
 
 	.guild-card-description.slide {
 		animation: text-container-slide 10s ease-in-out infinite alternate;

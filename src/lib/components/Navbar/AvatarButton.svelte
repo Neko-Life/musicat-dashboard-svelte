@@ -20,6 +20,7 @@
 		height: 100vh;
 		width: 100vw;
 		transition-duration: 0.2s;
+		z-index: 1;
 	}
 
 	.avatar:hover {
@@ -34,9 +35,5 @@
 	.avatar img {
 		max-height: 100%;
 		max-width: 100%;
-	}
-
-	.z-above {
-		z-index: 1;
 	}
 </style>
