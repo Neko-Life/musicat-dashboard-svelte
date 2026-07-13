@@ -2,12 +2,20 @@
 	import GuildCard from '$lib/components/GuildCard.svelte';
 	import type { IUserGuild } from '$lib/interfaces/services/general';
 	import useGetUserGuilds from '$lib/queries/useGetUserGuilds';
+	import useClientDimension from '$lib/hooks/useClientDimension.svelte';
 	import { user, pagination } from '$lib/store';
 	import { onMount } from 'svelte';
 
 	let search = $state('');
-	const perPage = 10;
+	let perPage = $state(1);
+	const guildListGap1024 = 20;
+	const guildListGap1366 = 40;
+	const guildListXPadding = 40;
+	const guildListYPadding = 60;
+	let guildListContainerEl: HTMLDivElement;
+	let guildCardEl: HTMLDivElement | undefined;
 
+	const clientDimension = useClientDimension();
 	const userGuilds = $derived(useGetUserGuilds({ enabled: !!$user }));
 
 	const guildList: IUserGuild[] = $derived.by(() => {
@@ -67,10 +75,14 @@
 					<input bind:value={search} />
 				</div>
 			</div>
-			<div class="guild-list-container">
-				{#each guildListInPage as guild}
+			<div bind:this={guildListContainerEl} class="guild-list-container">
+				{#each guildListInPage as guild, i}
 					{#key guild.id}
-						<GuildCard {guild} />
+						{#if i == 0}
+							<GuildCard bind:this={guildCardEl} {guild} />
+						{:else}
+							<GuildCard {guild} />
+						{/if}
 					{/key}
 				{/each}
 			</div>
@@ -124,25 +136,12 @@
 		gap: 0px;
 		justify-items: center;
 		align-content: start;
-		grid-template-columns: repeat(3, 1fr);
 		box-sizing: border-box;
+		flex-grow: 1;
 	}
 
 	.top-section {
 		position: relative;
-	}
-
-	@media (min-width: 480px) {
-		.guild-list-container {
-			grid-template-columns: repeat(4, 1fr);
-		}
-	}
-
-	@media (min-width: 720px) {
-		.guild-list-container {
-			grid-template-columns: repeat(5, 1fr);
-			gap: 8px;
-		}
 	}
 
 	@media (min-width: 1024px) {

@@ -80,21 +80,45 @@
 	};
 </script>
 
-<div id="top-navbar" class="bd-blur-5 {hidden ? 'hidden' : ''}">
-	<div class="user-info-container musicat-info">
+{#snippet musicatInviteBtn()}
+	<Button class="btn-login" on:click={handleInviteClick}>Invite</Button>
+{/snippet}
+
+{#snippet logoutBtn()}
+	<Button class="btn-login" on:click={handleLogoutClick}>Logout</Button>
+{/snippet}
+
+{#snippet userInfoContainer(
+	additionalClass?: string,
+	avatarDropdownClass?: string,
+	handleAvatarClick?: () => void,
+	dropdownBtn?: Snippet,
+	avatarSrc?: string
+)}
+	<div class="user-info-container {additionalClass || ''}">
 		<OuterClick
-			onOuterClick={mcAvatarDropdownClass.length ? handleMusicatAvatarClick : undefined}
+			onOuterClick={avatarDropdownClass?.length ? handleAvatarClick : undefined}
 			class="flexcolg0"
 		>
-			<div class="avatar-button-dropdown-container {mcAvatarDropdownClass}">
+			<div class="avatar-button-dropdown-container {avatarDropdownClass}">
 				<div class="btn-logout-container">
-					<Button class="btn-login" on:click={handleInviteClick}>Invite</Button>
+					{@render dropdownBtn()}
 				</div>
 			</div>
 
-			<AvatarButton on:click={handleMusicatAvatarClick} src={mcAvatar} />
+			<AvatarButton on:click={handleAvatarClick} src={avatarSrc} />
 		</OuterClick>
 	</div>
+{/snippet}
+
+<div id="top-navbar" class="bd-blur-5 {hidden ? 'hidden' : ''}">
+	{@render userInfoContainer(
+		'musicat-info',
+		mcAvatarDropdownClass,
+		handleMusicatAvatarClick,
+		musicatInviteBtn,
+		mcAvatar
+	)}
 
 	<div class="menu-list">
 		<button class="mobile-menu-btn" on:click={handleMobileMenuBtnClick}>
@@ -118,20 +142,13 @@
 			<LoginButton />
 		</div>
 	{:else}
-		<div class="user-info-container">
-			<OuterClick
-				onOuterClick={avatarDropdownClass.length ? handleAvatarClick : undefined}
-				class="flexcolg0"
-			>
-				<div class="avatar-button-dropdown-container {avatarDropdownClass}">
-					<div class="btn-logout-container">
-						<Button class="btn-login" on:click={handleLogoutClick}>Logout</Button>
-					</div>
-				</div>
-
-				<AvatarButton on:click={handleAvatarClick} src={userAvatar} />
-			</OuterClick>
-		</div>
+		{@render userInfoContainer(
+			'',
+			avatarDropdownClass,
+			handleAvatarClick,
+			logoutBtn,
+			userAvatar
+		)}
 	{/if}
 </div>
 
@@ -141,22 +158,13 @@
 			<ArrowLeftSolid width={40} />
 		</div>
 
-		<div class="user-info-container mobile-user-info">
-			<OuterClick
-				onOuterClick={mcAvatarMobileDropdownClass.length
-					? handleMusicatAvatarMobileClick
-					: undefined}
-				class="flexcolg0"
-			>
-				<div class="avatar-button-dropdown-container {mcAvatarMobileDropdownClass}">
-					<div class="btn-logout-container">
-						<Button class="btn-login" on:click={handleInviteClick}>Invite</Button>
-					</div>
-				</div>
-
-				<AvatarButton on:click={handleMusicatAvatarMobileClick} src={mcAvatar} />
-			</OuterClick>
-		</div>
+		{@render userInfoContainer(
+			'mobile-user-info',
+			mcAvatarMobileDropdownClass,
+			handleMusicatAvatarMobileClick,
+			musicatInviteBtn,
+			mcAvatar
+		)}
 	</div>
 
 	<div class="mobile-menu-list-container">
