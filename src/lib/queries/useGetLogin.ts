@@ -6,7 +6,7 @@ import type {
 import type { IBaseAPIResponse } from '$lib/interfaces/services';
 import { getLogin } from '$lib/services/auth';
 import { createLoginRedirectParam } from '$lib/utils/url';
-import { useQuery } from '@sveltestack/svelte-query';
+import { useQuery } from './useQuery';
 
 export function getDefaultGetLoginSuccessHandler({
 	origin,

@@ -1,6 +1,7 @@
 <!-- Providers and app layout here -->
 <script lang="ts">
-	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
+	import { browser } from '$app/environment';
+	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
 	import Navbar from '$lib/components/Navbar.svelte';
 	import { hideNavbar, updateUser } from '$lib/store';
 	import { onMount } from 'svelte';
@@ -12,7 +13,13 @@
 		updateUser();
 	});
 
-	const queryClient = new QueryClient();
+	const queryClient = new QueryClient({
+		defaultOptions: {
+			queries: {
+				enabled: browser
+			}
+		}
+	});
 </script>
 
 <QueryClientProvider client={queryClient}>
