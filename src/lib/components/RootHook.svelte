@@ -3,10 +3,8 @@
 	import type { IBotPreview } from '$lib/interfaces/services/general';
 
 	const musicatUser = useGetMusicatUser();
-	let mcUser: IBotPreview | undefined;
-	$: {
-		mcUser = $musicatUser?.data?.data;
-
+	const mcUser: IBotPreview | undefined = $derived(musicatUser?.data?.data);
+	$effect(() => {
 		if (mcUser?.username) {
 			document.title = `${mcUser.username} Dashboard`;
 		}
@@ -17,5 +15,5 @@
 				el.href = mcUser.avatar_url;
 			}
 		}
-	}
+	});
 </script>

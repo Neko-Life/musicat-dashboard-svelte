@@ -3,19 +3,14 @@
 	import { getGuildIconLink } from '$lib/utils/guild';
 	import { onMount } from 'svelte';
 
-	export let guild: IUserGuild;
+	let { guild }: { guild: IUserGuild } = $props();
 
-	let src: string | undefined;
-	let classNames: string;
-	$: {
-		src = guild
-			? getGuildIconLink({ guildId: guild.id, hash: guild.icon, size: 128 })
-			: undefined;
+	const src: string | undefined = $derived(
+		guild ? getGuildIconLink({ guildId: guild.id, hash: guild.icon, size: 128 }) : undefined
+	);
+	const classNames: string = $derived(!guild?.is_mutual ? 'non-mutual' : '');
 
-		classNames = !guild?.is_mutual ? 'non-mutual' : '';
-	}
-
-	let shouldSlide = false;
+	let shouldSlide = $state(false);
 
 	let descriptionContainerEl: HTMLDivElement;
 	let descriptionTextEl: HTMLDivElement;
@@ -112,7 +107,7 @@
 
 	.guild-card-container:hover .guild-card-description-container {
 		overflow: visible;
-        }
+	}
 
 	.guild-card-description {
 		position: relative;
@@ -130,8 +125,8 @@
 	}
 
 	.guild-card-container:hover .guild-card-description-text {
-                text-shadow: var(--default-text-color) 0px 0px 20px;
-        }
+		text-shadow: var(--default-text-color) 0px 0px 20px;
+	}
 
 	.guild-card-description.slide {
 		animation: text-container-slide 10s ease-in-out infinite alternate;

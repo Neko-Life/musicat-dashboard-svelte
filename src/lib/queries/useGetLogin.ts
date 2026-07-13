@@ -10,11 +10,9 @@ import { useQuery } from './useQuery';
 
 export function getDefaultGetLoginSuccessHandler({
 	origin,
-	goto,
 	cb
 }: IGetDefaultGetLoginSuccessHandlerParams) {
 	return (r: IBaseAPIResponse<string>) => {
-		console.log({ r });
 		if (!r.success) {
 			console.error('getLogin.json');
 			return;
@@ -23,19 +21,26 @@ export function getDefaultGetLoginSuccessHandler({
 		const redir = '&' + createLoginRedirectParam(origin + '/login');
 
 		const g = r.data + redir;
-
 		cb?.();
-
-		goto(g);
+		window.location.href = g;
 	};
 }
 
-export default function useGetLogin({ successRedirect, isInvite }: IUseGetLoginParams) {
+export default function useGetLogin(
+	{ successRedirect, isInvite }: IUseGetLoginParams,
+	opt?: Parameters<
+		typeof useQuery<
+			string,
+			Awaited<ReturnType<typeof getLogin>>,
+			Error,
+			Awaited<ReturnType<typeof getLogin>>,
+			readonly [string]
+		>
+	>[2]
+) {
 	return useQuery(
 		getLoginQueryId + (isInvite ? '-invite' : ''),
 		() => getLogin({ headerRedirect: successRedirect, isInvite }),
-		{
-			enabled: false
-		}
+		opt
 	);
 }

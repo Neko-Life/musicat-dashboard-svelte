@@ -1,9 +1,8 @@
 <script lang="ts">
-	// export let src: string | undefined;
-	export let active: boolean | undefined;
+	let { active, ...props } = $props();
 </script>
 
-<button class="menu-container {$$props.class || ''} {active ? 'active' : ''}" on:click>
+<button class="menu-container {props.class || ''} {active ? 'active' : ''}" on:click>
 	<!--
 	<div class="glow left" />
         -->

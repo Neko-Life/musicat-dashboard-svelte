@@ -1,9 +1,8 @@
 <script lang="ts">
-	// export let src: string | undefined;
-	export let active: boolean | undefined;
+	let { active, ...props }: { active: boolean | undefined; [k: string]: any } = $props();
 </script>
 
-<button class="menu-container {$$props.class || ''} {active ? 'active' : ''}" on:click>
+<button class="menu-container {props.class || ''} {active ? 'active' : ''}" on:click>
 	<!--
 	<div class="glow left" />
         -->
@@ -30,14 +29,14 @@
 
 	.menu-container * {
 		transition-duration: 0.5s;
-                transition-timing-function: ease-out;
+		transition-timing-function: ease-out;
 	}
 
 	.menu {
 		width: 100%;
 		cursor: pointer;
 		position: relative;
-                margin: 10px 0px 10px 0px;
+		margin: 10px 0px 10px 0px;
 		border-top: 0px solid transparent;
 		border-bottom: 0px solid transparent;
 		border-left: 10px solid transparent;
@@ -46,19 +45,21 @@
 	}
 
 	.menu-container:hover:not(.active) .menu {
-          border-left-color: white;
-          border-right-color: white;
+		border-left-color: white;
+		border-right-color: white;
 	}
 
 	.menu-container.active .menu,
 	.menu-container:active .menu {
-		box-shadow: inset 44px 0px 20px -25px white, inset -44px 0px 20px -25px white;
+		box-shadow:
+			inset 44px 0px 20px -25px white,
+			inset -44px 0px 20px -25px white;
 	}
 
 	.menu-container.active .menu {
 		border-top: 10px solid white;
 		border-bottom: 10px solid white;
-                margin: 0px;
+		margin: 0px;
 	}
 
 	.menu-border {

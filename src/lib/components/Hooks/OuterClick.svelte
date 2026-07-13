@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	export let onOuterClick: ((e: MouseEvent) => void) | undefined;
+	let {
+		onOuterClick,
+		...props
+	}: { onOuterClick: ((e: MouseEvent) => void) | undefined; [k: string]: any } = $props();
 
 	let containerEl: HTMLDivElement;
 
@@ -29,7 +32,7 @@
 	});
 </script>
 
-<div bind:this={containerEl} {...$$props}>
+<div bind:this={containerEl} {...props}>
 	<slot />
 </div>
 

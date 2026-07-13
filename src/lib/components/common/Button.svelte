@@ -1,8 +1,8 @@
 <script lang="ts">
-	export let disabled: boolean = false;
+	let { disabled = false, ...props }: { disabled: boolean; [k: string]: any } = $props();
 </script>
 
-<button class="btn {$$props.class || ''}" on:click {disabled}>
+<button class="btn {props.class || ''}" on:click {disabled}>
 	<slot />
 </button>
 
@@ -30,9 +30,9 @@
 
 	.btn.pagination {
 		width: 100%;
-                height: 100%;
+		height: 100%;
 		border-radius: 0px;
-                font-size: 16px;
+		font-size: 16px;
 	}
 
 	.btn.pagination.active,

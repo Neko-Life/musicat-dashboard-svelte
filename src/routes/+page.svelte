@@ -5,14 +5,14 @@
 </script>
 
 <div class="page-container">
-	<div class="avatar-container {$musicatUser.data?.data.avatar_url.length ? 'active' : ''}">
-		<img loading="lazy" src={$musicatUser.data?.data.avatar_url} alt="" width="100%" />
+	<div class="avatar-container {musicatUser.data?.data.avatar_url.length ? 'active' : ''}">
+		<img loading="lazy" src={musicatUser.data?.data.avatar_url} alt="" width="100%" />
 	</div>
 
 	<div class="desc-container">
-		<h1>{$musicatUser.data?.data.username || ''}</h1>
+		<h1>{musicatUser.data?.data.username || ''}</h1>
 
-		<p>{$musicatUser.data?.data.description || ''}</p>
+		<p>{musicatUser.data?.data.description || ''}</p>
 	</div>
 </div>
 

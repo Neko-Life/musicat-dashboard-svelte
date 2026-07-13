@@ -1,8 +1,8 @@
 <script lang="ts">
-	export let src: string | undefined;
+	let { src, ...props }: { src: string | undefined; [k: string]: any } = $props();
 </script>
 
-<button class="avatar {$$props.class || ''}" on:click>
+<button class="avatar {props.class || ''}" on:click>
 	<img loading="lazy" {src} alt="Avatar" />
 </button>
 

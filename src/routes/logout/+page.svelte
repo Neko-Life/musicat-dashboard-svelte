@@ -23,5 +23,6 @@
 		flex-grow: 1;
 		justify-content: center;
 		align-items: center;
+		text-align: center;
 	}
 </style>

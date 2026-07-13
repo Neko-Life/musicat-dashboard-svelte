@@ -7,30 +7,52 @@
 	import type { IBaseAPIResponse, IErrorPayload } from '$lib/interfaces/services';
 	import { setLoggedInUser } from '$lib/utils/user';
 
-	let loader = 'Logging in...';
+	let loader = $state('Logging in...');
 
-	let loginQuery: ReturnType<typeof useGetLogin>;
-	$: loginQuery = useGetLogin({
-		successRedirect: successRedir,
-		isInvite: $page.url.searchParams.get('invite') === '1'
-	});
+	const successRedir = $derived(
+		decodeURIComponent($page.url.searchParams.get('redirect') || '') || '/'
+	);
 
-	const origin = $page.url.origin;
-	const handleGetLoginResponse = getDefaultGetLoginSuccessHandler({
-		origin,
-		goto,
-		cb: () => {
-			loginQuery.setEnabled(false);
-		}
-	});
+	let loginQueryEnabled = $state(false);
+	const loginQuery = $derived(
+		useGetLogin(
+			{
+				successRedirect: successRedir,
+				isInvite: $page.url.searchParams.get('invite') === '1'
+			},
+			{
+				enabled: loginQueryEnabled
+			}
+		)
+	);
 
-	const successRedir = decodeURIComponent($page.url.searchParams.get('redirect') || '') || '/';
+	const origin = $derived($page.url.origin);
+	const handleGetLoginResponse = $derived(
+		getDefaultGetLoginSuccessHandler({
+			origin,
+			cb: () => {
+				loginQueryEnabled = false;
+			}
+		})
+	);
 
 	onMount(() => {
-		const code = $page.url.searchParams.get('code');
+		const error = $page.url.searchParams.get('error');
+		if (error?.length) {
+			const error_description = $page.url.searchParams.get('error_description');
+			if (
+				error_description == 'The resource owner or authorization server denied the request'
+			) {
+				loader = "Invite cancelled, you can try to invite again whenever you're ready.";
+				return;
+			}
+			loader = 'Failed logging in: ' + (error_description || error);
+			return;
+		}
 
+		const code = $page.url.searchParams.get('code');
 		if (!code?.length) {
-			loginQuery.setEnabled(true);
+			loginQueryEnabled = true;
 			return;
 		}
 
@@ -65,14 +87,16 @@
 			});
 	});
 
-	$: if ($loginQuery.data) {
-		handleGetLoginResponse($loginQuery.data);
-		loginQuery.setEnabled(false);
-	}
+	$effect(() => {
+		if (loginQuery.data) {
+			handleGetLoginResponse(loginQuery.data);
+			loginQueryEnabled = false;
+		}
+	});
 </script>
 
 <div class="page-container">
-	<h1>{$loginQuery.isError ? 'Error logging in' : loader}</h1>
+	<h1>{loginQuery.isError ? 'Error logging in' : loader}</h1>
 </div>
 
 <style>
@@ -81,5 +105,6 @@
 		flex-grow: 1;
 		justify-content: center;
 		align-items: center;
+		text-align: center;
 	}
 </style>

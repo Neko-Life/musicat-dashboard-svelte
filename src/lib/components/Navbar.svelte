@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let hidden: boolean | undefined;
+	let { hidden }: { hidden: boolean | undefined } = $props();
 
 	import Button from './common/Button.svelte';
 	import { page } from '$app/stores';
@@ -16,48 +16,39 @@
 	import MenuMobile from './Navbar/MenuMobile.svelte';
 	import OuterClick from './Hooks/OuterClick.svelte';
 
-	let showMobileMenus = false;
+	let showMobileMenus = $state(false);
 
-	let avatarDropdownClass: string = '';
-	let mcAvatarDropdownClass: string = '';
+	let avatarDropdownClass: string = $state('');
+	let mcAvatarDropdownClass: string = $state('');
+	let mcAvatarMobileDropdownClass: string = $state('');
 
 	const musicatUser = useGetMusicatUser();
 
-	let userAvatar: string | undefined;
-	let mcAvatar: string | undefined;
-	let loggedInMenus: { name: string; path: string }[];
-	let menuList: typeof loggedInMenus;
-
-	$: {
-		if ($user) {
-			userAvatar = getUserAvatarLink({
-				userId: $user.id,
-				hash: $user.avatar,
-				size: 64
-			});
-		} else userAvatar = undefined;
-
-		if ($musicatUser?.data?.data) {
-			mcAvatar = $musicatUser?.data?.data.avatar_url;
-		}
-
-		loggedInMenus = $user
+	const userAvatar: string | undefined = $derived(
+		getUserAvatarLink({
+			userId: $user.id,
+			hash: $user.avatar,
+			size: 64
+		})
+	);
+	const mcAvatar: string | undefined = $derived(musicatUser?.data?.data.avatar_url);
+	const loggedInMenus: { name: string; path: string }[] = $derived(
+		$user
 			? [
 					{
 						name: 'My Server List',
 						path: '/guilds'
 					}
-			  ]
-			: [];
-
-		menuList = [
-			{
-				name: 'Home',
-				path: '/'
-			},
-			...loggedInMenus
-		];
-	}
+				]
+			: []
+	);
+	const menuList: typeof loggedInMenus = $derived([
+		{
+			name: 'Home',
+			path: '/'
+		},
+		...loggedInMenus
+	]);
 
 	const handleLogoutClick = () => {
 		goto('/logout');
@@ -69,6 +60,10 @@
 
 	const handleMusicatAvatarClick = () => {
 		mcAvatarDropdownClass = mcAvatarDropdownClass.length ? '' : 'show';
+	};
+
+	const handleMusicatAvatarMobileClick = () => {
+		mcAvatarMobileDropdownClass = mcAvatarMobileDropdownClass.length ? '' : 'show';
 	};
 
 	const handleInviteClick = () => {
@@ -86,7 +81,7 @@
 </script>
 
 <div id="top-navbar" class="bd-blur-5 {hidden ? 'hidden' : ''}">
-	<div class="user-info-container">
+	<div class="user-info-container musicat-info">
 		<OuterClick
 			onOuterClick={mcAvatarDropdownClass.length ? handleMusicatAvatarClick : undefined}
 			class="flexcolg0"
@@ -140,24 +135,41 @@
 	{/if}
 </div>
 
-{#if showMobileMenus}
-	<div class="mobile-menus">
-		<div class="mobile-menus-top" role="button" on:click={handleMobileMenuBtnClick}>
+<div class="mobile-menus {showMobileMenus ? 'open' : ''}">
+	<div class="mobile-menus-top">
+		<div role="button" on:click={handleMobileMenuBtnClick}>
 			<ArrowLeftSolid width={40} />
 		</div>
 
-		<div class="mobile-menu-list-container">
-			{#each menuList as menu}
-				<MenuMobile
-					on:click={() => handleMenuClick(menu, true)}
-					active={matchPath(menu.path, $page.url.pathname)}
-				>
-					<span class="menu-name">{menu.name}</span>
-				</MenuMobile>
-			{/each}
+		<div class="user-info-container mobile-user-info">
+			<OuterClick
+				onOuterClick={mcAvatarMobileDropdownClass.length
+					? handleMusicatAvatarMobileClick
+					: undefined}
+				class="flexcolg0"
+			>
+				<div class="avatar-button-dropdown-container {mcAvatarMobileDropdownClass}">
+					<div class="btn-logout-container">
+						<Button class="btn-login" on:click={handleInviteClick}>Invite</Button>
+					</div>
+				</div>
+
+				<AvatarButton on:click={handleMusicatAvatarMobileClick} src={mcAvatar} />
+			</OuterClick>
 		</div>
 	</div>
-{/if}
+
+	<div class="mobile-menu-list-container">
+		{#each menuList as menu}
+			<MenuMobile
+				on:click={() => handleMenuClick(menu, true)}
+				active={matchPath(menu.path, $page.url.pathname)}
+			>
+				<span class="menu-name">{menu.name}</span>
+			</MenuMobile>
+		{/each}
+	</div>
+</div>
 
 <style>
 	#top-navbar {
@@ -195,6 +207,14 @@
 		box-sizing: border-box;
 	}
 
+	.user-info-container.mobile-user-info {
+		width: unset;
+	}
+
+	.musicat-info {
+		display: none;
+	}
+
 	.btn-logout-container {
 		position: absolute;
 		padding: 8px;
@@ -211,7 +231,10 @@
 	}
 
 	.avatar-button-dropdown-container .btn-logout-container {
-		transition: opacity 0.5s ease-in, top 0.5s ease-out, visibility 0.5s ease-out;
+		transition:
+			opacity 0.5s ease-in,
+			top 0.5s ease-out,
+			visibility 0.5s ease-out;
 		opacity: 0;
 		visibility: hidden;
 		top: 0;
@@ -226,17 +249,25 @@
 	.mobile-menus {
 		position: fixed;
 		top: 0;
-		left: 0;
+		left: -100%;
 		width: 100vw;
 		height: 100vh;
 		z-index: 100;
 		background-color: black;
+		transition-duration: 300ms;
+	}
+
+	.mobile-menus.open {
+		left: 0;
 	}
 
 	.mobile-menus-top {
 		padding: 16px 24px;
 		border-bottom: 1px solid blue;
 		box-shadow: 0px 0px 50px 0px blue;
+
+		display: flex;
+		justify-content: space-between;
 	}
 
 	.mobile-menu-list-container {
@@ -260,6 +291,7 @@
 		border-radius: 6px;
 		padding: 4px 8px;
 		border: 1px solid transparent;
+		width: 115px;
 	}
 
 	.mobile-menu-btn:active,
@@ -282,6 +314,10 @@
 
 		.mobile-menu-btn {
 			display: none;
+		}
+
+		.musicat-info {
+			display: flex;
 		}
 	}
 

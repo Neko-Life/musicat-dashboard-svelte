@@ -5,27 +5,16 @@
 	import { user, pagination } from '$lib/store';
 	import { onMount } from 'svelte';
 
-	let search = '';
+	let search = $state('');
 	const perPage = 10;
 
-	const userGuilds = useGetUserGuilds({ enabled: !!$user });
-	$: userGuilds.setEnabled(!!$user);
+	const userGuilds = $derived(useGetUserGuilds({ enabled: !!$user }));
 
-	let guildList: IUserGuild[];
-	let guildListInPage: typeof guildList;
-	$: {
-		if (!$pagination) {
-			$pagination = {
-				page: 1,
-				maxPage: 1
-			};
-		}
-
-		const filterIndexes = perPage * $pagination.page;
+	const guildList: IUserGuild[] = $derived.by(() => {
 		const searchLowCase = search.toLocaleLowerCase();
-
-		guildList =
-			$userGuilds.data?.data
+		console.log({ g: userGuilds.data?.data, searchLowCase });
+		return (
+			userGuilds.data?.data
 				?.filter((v) =>
 					search.length ? v.name.toLocaleLowerCase().includes(searchLowCase) : true
 				)
@@ -34,17 +23,30 @@
 					if (!a.is_mutual && b.is_mutual) return 1;
 
 					return 0;
-				}) || [];
-
-		$pagination.maxPage = (guildList.length && Math.ceil(guildList.length / perPage)) || 1;
-		guildListInPage = guildList.filter(
-			(_v, i) => i >= filterIndexes - perPage && i < filterIndexes
+				}) || []
 		);
-	}
-
-	onMount(() => () => {
-		$pagination = undefined;
 	});
+
+	const newm = $derived((guildList.length && Math.ceil(guildList.length / perPage)) || 1);
+	$effect(() => {
+		if (!guildList.length) return ($pagination = undefined);
+		if (!$pagination) {
+			$pagination = {
+				page: 1,
+				maxPage: 1
+			};
+		}
+		if ($pagination.maxPage == newm) return;
+		$pagination.maxPage = newm;
+		$pagination.page = 1;
+	});
+
+	const guildListInPage: typeof guildList = $derived.by(() => {
+		const filterIndexes = perPage * ($pagination?.page || 1);
+		return guildList.filter((_v, i) => i >= filterIndexes - perPage && i < filterIndexes);
+	});
+
+	onMount(() => () => ($pagination = undefined));
 </script>
 
 <div class="flex-center top-section">
@@ -55,9 +57,9 @@
 	<div class="content">
 		{#if !$user}
 			<div class="error-container login-container">You're not logged in</div>
-		{:else if $userGuilds.isError}
+		{:else if userGuilds.isError}
 			<div class="error-container">Error getting guilds</div>
-		{:else if $userGuilds.isLoading}
+		{:else if userGuilds.isLoading}
 			<div class="error-container">Loading...</div>
 		{:else}
 			<div class="top-content">
@@ -80,6 +82,10 @@
 	.error-container,
 	.page-container {
 		flex-grow: 1;
+	}
+
+	.page-container {
+		overflow: hidden;
 	}
 
 	.error-container {

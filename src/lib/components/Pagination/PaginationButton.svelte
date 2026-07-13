@@ -3,14 +3,20 @@
 	import { pagination } from '$lib/store';
 	import type { KeyboardEventHandler } from 'svelte/elements';
 
-	export let index: number = 0;
-	export let inputPage: boolean = false;
-	export let inputPageValue = '';
+	let {
+		index = 0,
+		inputPage = false,
+		onPageClick
+	}: {
+		index: number;
+		inputPage: boolean;
 
-	/**
-	 * Should return 0 if continue, 1 if return after call
-	 */
-	export let onPageClick: ((page: number) => 0 | 1) | undefined = undefined;
+		/**
+		 * Should return 0 if continue, 1 if return after call
+		 */
+		onPageClick: ((page: number) => 0 | 1) | undefined;
+	} = $props();
+	let inputPageValue = $state('');
 
 	const handlePaginationClick = (page: number) => {
 		if (!$pagination || onPageClick?.(page)) return;
@@ -44,7 +50,7 @@
 		inputPage = false;
 	};
 
-	$: noInputPage = index === -1;
+	let noInputPage = $derived(index === -1);
 </script>
 
 {#if $pagination !== undefined}
