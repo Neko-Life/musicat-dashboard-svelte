@@ -1,6 +1,6 @@
 import { getAPIUrl } from '$lib/utils/services';
 
-const DEBUG_LOG = true;
+const DEBUG_LOG = false;
 
 export enum EventTypeE {
 	ERROR,
@@ -72,10 +72,12 @@ export class WSCon {
 	// this element should be controlled by ws event!
 	audioEl: HTMLAudioElement | undefined;
 	reconnectInterval: number | null | undefined;
+	debugMode: boolean;
 
 	on: Partial<WSConEventHandler>;
 
 	constructor(url: string, guildId: string) {
+		this.debugMode = false;
 		this.on = {};
 		this.waved = false;
 		this.guildId = guildId;
@@ -145,7 +147,7 @@ export class WSCon {
 		newAudio.load();
 		this.audioEl = newAudio;
 
-		if (!DEBUG_LOG) return;
+		if (!DEBUG_LOG || !this.debugMode) return;
 		const getLog =
 			(n: string) =>
 			(...args: any[]) =>

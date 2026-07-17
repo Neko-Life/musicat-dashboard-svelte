@@ -131,8 +131,8 @@
 	.guild-card-container:hover .guild-card-description-text {
 		text-shadow:
 			var(--default-text-color) 0px 0px 20px,
-			red 1px 1px,
-			blue 2px 2px;
+			red 2px 2px,
+			blue 4px 4px;
 		padding: 1px 6px;
 		transition-duration: 0.5s;
 		background-color: rgba(0, 0, 0, 0.7);

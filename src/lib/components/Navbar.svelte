@@ -269,10 +269,15 @@
 		left: 0;
 	}
 
+	.mobile-menus-top,
+	#top-navbar {
+		box-shadow: 0px 0px 50px 0 var(--default-color-hint);
+		background-color: var(--default-bg-color-hint);
+                border-bottom: 1px solid var(--default-color-hint);
+	}
+
 	.mobile-menus-top {
 		padding: 16px 24px;
-		border-bottom: 1px solid blue;
-		box-shadow: 0px 0px 50px 0px blue;
 
 		display: flex;
 		justify-content: space-between;
