@@ -108,6 +108,7 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
+		align-items: center;
 		height: 100%;
 	}
 
@@ -115,6 +116,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		max-width: 1280px;
 	}
 
 	.thumbnail-container img {
@@ -124,7 +126,7 @@
 	.controls {
 		position: sticky;
 		bottom: 0;
-		height: calc(100% / 3);
+		height: calc(100% / 5);
 
 		width: 100%;
 

@@ -112,44 +112,46 @@
 {/snippet}
 
 <div id="top-navbar" class="bd-blur-5 {hidden ? 'hidden' : ''}">
-	{@render userInfoContainer(
-		'musicat-info',
-		mcAvatarDropdownClass,
-		handleMusicatAvatarClick,
-		musicatInviteBtn,
-		mcAvatar
-	)}
-
-	<div class="menu-list">
-		<button class="mobile-menu-btn" on:click={handleMobileMenuBtnClick}>
-			<BarsSolid width={35} />
-		</button>
-
-		<div class="menu-items-container">
-			{#each menuList as menu}
-				<Menu
-					on:click={() => handleMenuClick(menu)}
-					active={matchPath(menu.path, $page.url.pathname)}
-				>
-					<span class="menu-name">{menu.name}</span>
-				</Menu>
-			{/each}
-		</div>
-	</div>
-
-	{#if !$user}
-		<div class="btn-login-container">
-			<LoginButton />
-		</div>
-	{:else}
+	<div class="nav">
 		{@render userInfoContainer(
-			'',
-			avatarDropdownClass,
-			handleAvatarClick,
-			logoutBtn,
-			userAvatar
+			'musicat-info',
+			mcAvatarDropdownClass,
+			handleMusicatAvatarClick,
+			musicatInviteBtn,
+			mcAvatar
 		)}
-	{/if}
+
+		<div class="menu-list">
+			<button class="mobile-menu-btn" on:click={handleMobileMenuBtnClick}>
+				<BarsSolid width={35} />
+			</button>
+
+			<div class="menu-items-container">
+				{#each menuList as menu}
+					<Menu
+						on:click={() => handleMenuClick(menu)}
+						active={matchPath(menu.path, $page.url.pathname)}
+					>
+						<span class="menu-name">{menu.name}</span>
+					</Menu>
+				{/each}
+			</div>
+		</div>
+
+		{#if !$user}
+			<div class="btn-login-container">
+				<LoginButton />
+			</div>
+		{:else}
+			{@render userInfoContainer(
+				'',
+				avatarDropdownClass,
+				handleAvatarClick,
+				logoutBtn,
+				userAvatar
+			)}
+		{/if}
+	</div>
 </div>
 
 <div class="mobile-menus {showMobileMenus ? 'open' : ''}">
@@ -181,17 +183,24 @@
 
 <style>
 	#top-navbar {
+		display: flex;
+                justify-content: center;
+		align-items: center;
 		transition-duration: 2s;
 		position: sticky;
-		width: 100%;
-		box-sizing: border-box;
 		top: 0;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 24px;
 		z-index: 5;
 		transform: translateY(0%);
+	}
+
+	#top-navbar .nav {
+		width: 100%;
+		box-sizing: border-box;
+		justify-content: space-between;
+		display: flex;
+		align-items: center;
+		padding: 16px;
+		max-width: 1280px;
 	}
 
 	#top-navbar.hidden {
@@ -273,7 +282,7 @@
 	#top-navbar {
 		box-shadow: 0px 0px 50px 0 var(--default-color-hint);
 		background-color: var(--default-bg-color-hint);
-                border-bottom: 1px solid var(--default-color-hint);
+		border-bottom: 1px solid var(--default-color-hint);
 	}
 
 	.mobile-menus-top {
@@ -295,6 +304,7 @@
 	.menu-items-container {
 		display: none;
 		width: 100%;
+		gap: 8px;
 	}
 
 	.mobile-menu-btn {
@@ -314,7 +324,7 @@
 	}
 
 	@media (max-width: 720px) {
-		#top-navbar {
+		#top-navbar .nav {
 			padding: 12px 0px;
 		}
 	}
