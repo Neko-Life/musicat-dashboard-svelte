@@ -2,6 +2,7 @@
 	import type { IUserGuild } from '$lib/interfaces/services/general';
 	import { getGuildIconLink } from '$lib/utils/guild';
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 
 	let { guild }: { guild: IUserGuild } = $props();
 
@@ -22,9 +23,13 @@
 
 		return () => (shouldSlide = false);
 	});
+
+	function handleClick() {
+		goto('/guilds/' + guild.id);
+	}
 </script>
 
-<button class="guild-card-container">
+<button class="guild-card-container" on:click={handleClick}>
 	<div class="img-container">
 		<img class={classNames} loading="lazy" {src} alt="Guild Icon" />
 	</div>
@@ -121,11 +126,17 @@
 		white-space: nowrap;
 		min-width: 100%;
 		width: fit-content;
-		position: absolute;
 	}
 
 	.guild-card-container:hover .guild-card-description-text {
-		text-shadow: var(--default-text-color) 0px 0px 20px;
+		text-shadow:
+			var(--default-text-color) 0px 0px 20px,
+			red 1px 1px,
+			blue 2px 2px;
+		padding: 1px 6px;
+		transition-duration: 0.5s;
+		background-color: rgba(0, 0, 0, 0.7);
+		color: var(--default-text-color);
 	}
 
 	.guild-card-description.slide {

@@ -6,6 +6,7 @@ import type {
 import type { IBaseAPIResponse } from '$lib/interfaces/services';
 import { getLogin } from '$lib/services/auth';
 import { createLoginRedirectParam } from '$lib/utils/url';
+import { logout } from '$lib/utils/user';
 import { useQuery } from './useQuery';
 
 export function getDefaultGetLoginSuccessHandler({
@@ -22,7 +23,10 @@ export function getDefaultGetLoginSuccessHandler({
 
 		const g = r.data + redir;
 		cb?.();
-		window.location.href = g;
+
+		logout().finally(() => {
+			window.location.href = g;
+		});
 	};
 }
 

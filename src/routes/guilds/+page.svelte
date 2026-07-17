@@ -2,25 +2,89 @@
 	import GuildCard from '$lib/components/GuildCard.svelte';
 	import type { IUserGuild } from '$lib/interfaces/services/general';
 	import useGetUserGuilds from '$lib/queries/useGetUserGuilds';
-	import useClientDimension from '$lib/hooks/useClientDimension.svelte';
 	import { user, pagination } from '$lib/store';
 	import { onMount } from 'svelte';
 
 	let search = $state('');
 	let perPage = $state(1);
-	const guildListGap1024 = 20;
-	const guildListGap1366 = 40;
-	const guildListXPadding = 40;
-	const guildListYPadding = 60;
-	let guildListContainerEl: HTMLDivElement;
-	let guildCardEl: HTMLDivElement | undefined;
 
-	const clientDimension = useClientDimension();
+	function setGuildPerPage(widthFor: number, heightFor: number) {
+		let newPerPage = widthFor * heightFor;
+		if (newPerPage < 1) newPerPage = 1;
+		const setGridCol = `repeat(${widthFor}, 1fr)`;
+
+		if (perPage != newPerPage) perPage = newPerPage;
+		if (guildListContainerEl.style['grid-template-columns'] != setGridCol)
+			guildListContainerEl.style['grid-template-columns'] = setGridCol;
+	}
+
+	function getCardGap() {
+		const guildListGapMobile = 0;
+		const guildListGap1024 = 20;
+		const guildListGap1366 = 30;
+
+		const cw = document.body.clientWidth;
+		return cw > 1366 ? guildListGap1366 : cw > 1024 ? guildListGap1024 : guildListGapMobile;
+	}
+
+	let guildListContainerEl: HTMLDivElement | undefined = $state();
+	let guildListContainerWidth: number = $state(0);
+	let guildListContainerHeight: number = $state(0);
+	let guildCardWidth: number = $state(0);
+	let guildCardHeight: number = $state(0);
+
+	function calcAvailableSpace() {
+		if (document.body.clientWidth < 242) return setGuildPerPage(1, 10);
+
+		const guildListXPadding = 40;
+		const guildListYPadding = 60;
+
+		const cardGap = getCardGap();
+
+		let widthFor = 0;
+		let heightFor = 0;
+
+		while (true) {
+			const nW = widthFor + 1;
+			const sumGap = (nW - 1) * cardGap;
+			const sumW = sumGap + nW * guildCardWidth + guildListXPadding;
+			if (sumW < guildListContainerWidth) {
+				widthFor = nW;
+				continue;
+			}
+			break;
+		}
+
+		while (true) {
+			const nH = heightFor + 1;
+			const sumGap = (nH - 1) * cardGap;
+			const sumH = sumGap + nH * guildCardHeight + guildListYPadding;
+			if (sumH < guildListContainerHeight) {
+				heightFor = nH;
+				continue;
+			}
+			break;
+		}
+
+		setGuildPerPage(widthFor, heightFor);
+	}
+
+	$effect(() => {
+		if (
+			!guildListContainerWidth ||
+			!guildListContainerHeight ||
+			!guildCardWidth ||
+			!guildCardHeight
+		)
+			return;
+
+		calcAvailableSpace();
+	});
+
 	const userGuilds = $derived(useGetUserGuilds({ enabled: !!$user }));
 
 	const guildList: IUserGuild[] = $derived.by(() => {
 		const searchLowCase = search.toLocaleLowerCase();
-		console.log({ g: userGuilds.data?.data, searchLowCase });
 		return (
 			userGuilds.data?.data
 				?.filter((v) =>
@@ -57,9 +121,7 @@
 	onMount(() => () => ($pagination = undefined));
 </script>
 
-<div class="flex-center top-section">
-	<h1>My Server List</h1>
-</div>
+<div class="flex-center top-section"></div>
 
 <div class="page-container">
 	<div class="content">
@@ -75,13 +137,26 @@
 					<input bind:value={search} />
 				</div>
 			</div>
-			<div bind:this={guildListContainerEl} class="guild-list-container">
+			<div
+				bind:clientWidth={guildListContainerWidth}
+				bind:clientHeight={guildListContainerHeight}
+				bind:this={guildListContainerEl}
+				class="guild-list-container"
+			>
 				{#each guildListInPage as guild, i}
 					{#key guild.id}
 						{#if i == 0}
-							<GuildCard bind:this={guildCardEl} {guild} />
+							<div
+								class="gcard-container"
+								bind:clientWidth={guildCardWidth}
+								bind:clientHeight={guildCardHeight}
+							>
+								<GuildCard {guild} />
+							</div>
 						{:else}
-							<GuildCard {guild} />
+							<div class="gcard-container">
+								<GuildCard {guild} />
+							</div>
 						{/if}
 					{/key}
 				{/each}
@@ -98,6 +173,7 @@
 
 	.page-container {
 		overflow: hidden;
+		min-height: 100vh;
 	}
 
 	.error-container {
@@ -117,7 +193,12 @@
 	.top-content {
 		width: 100%;
 		padding-top: 12px;
+		position: fixed;
+		right: 0;
+		z-index: 1;
+		/*
 		max-width: 1280px;
+                */
 	}
 
 	.input-container {
@@ -129,9 +210,12 @@
 
 	.guild-list-container {
 		width: 100%;
+		/*
 		max-width: 1280px;
+                */
 		padding: 20px 20px 40px 20px;
 		display: grid;
+		justify-content: center;
 		align-items: center;
 		gap: 0px;
 		justify-items: center;
@@ -144,6 +228,11 @@
 		position: relative;
 	}
 
+	.gcard-container:hover {
+		transition-duration: 0.5s;
+		z-index: 1;
+	}
+
 	@media (min-width: 1024px) {
 		.guild-list-container {
 			gap: 20px;
@@ -152,7 +241,7 @@
 
 	@media (min-width: 1366px) {
 		.guild-list-container {
-			gap: 40px;
+			gap: 30px;
 		}
 	}
 </style>

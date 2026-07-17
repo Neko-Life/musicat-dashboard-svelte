@@ -61,3 +61,16 @@ export async function getUserGuilds() {
 
 	return processResponse<IBaseAPIResponse<IUserGuild[]>>(res);
 }
+
+export async function postLogout() {
+	const url = getAPIUrl('/logout');
+
+	const res = await fetch(url, {
+		method: 'POST',
+		credentials: 'include'
+	});
+
+	if (res && !res.ok) throw res;
+
+	return res;
+}

@@ -1,8 +1,9 @@
 import { DISCORD_CDN } from '$lib/config/constants';
 import type { IUser } from '$lib/interfaces/services/auth';
+import { postLogout } from '$lib/services/general';
 import { user as userStore } from '$lib/store';
 import { getIconFallback } from './icon';
-import { removeStorage, setStorage } from './localStorage';
+import { getStorage, removeStorage, setStorage } from './localStorage';
 
 export function setLoggedInUser(user: IUser) {
 	setStorage('user', user);
@@ -12,6 +13,11 @@ export function setLoggedInUser(user: IUser) {
 export function removeLoggedInUser() {
 	removeStorage('user');
 	userStore.set(undefined);
+}
+
+export async function logout() {
+	if (getStorage('user')) await postLogout();
+	removeLoggedInUser();
 }
 
 export function getUserAvatarLink({ userId = '', hash = '', format = '', size = 4096 } = {}) {

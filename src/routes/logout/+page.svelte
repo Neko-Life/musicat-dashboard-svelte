@@ -1,16 +1,13 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { removeLoggedInUser } from '$lib/utils/user';
+	import { logout } from '$lib/utils/user';
 	import { onMount } from 'svelte';
 
 	let loader = 'Logging out...';
 
 	onMount(() => {
-		removeLoggedInUser();
-		goto('/');
+		logout().finally(() => goto('/'));
 	});
-
-	// !TODO: notify backend? maybe no need for now
 </script>
 
 <div class="page-container">

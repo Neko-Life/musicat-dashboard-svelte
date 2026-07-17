@@ -1,3 +1,5 @@
+import { browser } from '$app/environment';
+
 export function isOnBrowser() {
-	return typeof window !== 'undefined';
+	return browser;
 }

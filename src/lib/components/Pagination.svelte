@@ -50,7 +50,7 @@
 
 <style>
 	.pagination-container {
-		bottom: 0;
+		bottom: 8px;
 		position: sticky;
 		display: flex;
 		justify-content: center;
