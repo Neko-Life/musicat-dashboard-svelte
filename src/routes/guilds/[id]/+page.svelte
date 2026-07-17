@@ -104,11 +104,11 @@
 	}
 
 	.content {
+		transition-duration: 2s;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		height: 100%;
-		padding: 0 12px;
 	}
 
 	.thumbnail-container {
@@ -180,5 +180,11 @@
 			transparent,
 			rgba(255, 255, 255, 0.3)
 		);
+	}
+
+	@media screen and (min-width: 600px) {
+		.content {
+			padding: 0 12px;
+		}
 	}
 </style>
