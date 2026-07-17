@@ -41,7 +41,7 @@
 		if (error?.length) {
 			const error_description = $page.url.searchParams.get('error_description');
 			if (
-				error_description == 'The resource owner or authorization server denied the request'
+				error_description === 'The resource owner or authorization server denied the request'
 			) {
 				loader = "Invite cancelled, you can try to invite again whenever you're ready.";
 				return;

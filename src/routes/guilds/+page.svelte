@@ -108,7 +108,7 @@
 				maxPage: 1
 			};
 		}
-		if ($pagination.maxPage == newm) return;
+		if ($pagination.maxPage === newm) return;
 		$pagination.maxPage = newm;
 		$pagination.page = 1;
 	});
@@ -145,7 +145,7 @@
 			>
 				{#each guildListInPage as guild, i}
 					{#key guild.id}
-						{#if i == 0}
+						{#if i === 0}
 							<div
 								class="gcard-container"
 								bind:clientWidth={guildCardWidth}

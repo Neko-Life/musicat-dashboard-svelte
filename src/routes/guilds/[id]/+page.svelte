@@ -9,6 +9,7 @@
 	let ws: WSCon | undefined;
 	$effect(() => {
 		ws = new WSCon(getWSUrl('/ws/player/' + params.id), params.id);
+                window.ws = ws;
 	});
 	onMount(() => ws?.onMount());
 </script>
