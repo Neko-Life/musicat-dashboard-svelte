@@ -90,6 +90,7 @@ export class WSCon {
 		this.waved = false;
 		this.guildId = newGuildId || this.guildId;
 		this.url = newUrl || this.url;
+                if (this.con) this.con.close();
 		this.con = new WebSocket(this.url);
 		this.setupHandlers();
 	}
@@ -147,7 +148,7 @@ export class WSCon {
 		newAudio.load();
 		this.audioEl = newAudio;
 
-		if (!DEBUG_LOG || !this.debugMode) return;
+		if (!DEBUG_LOG && !this.debugMode) return;
 		const getLog =
 			(n: string) =>
 			(...args: any[]) =>
