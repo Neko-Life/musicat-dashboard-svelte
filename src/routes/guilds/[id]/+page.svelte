@@ -101,7 +101,7 @@
 				</div>
 				{#if !nowPlaying}
 					<div class="desc-container Author-MediumItalic">
-						<h2>Seems like this guild doesn't have active voice session... 🦗🦗</h2>
+						<h2>Seems like this guild doesn't have an active voice session... 🦗🦗</h2>
 					</div>
 				{:else}
 					<div class="desc-container">
