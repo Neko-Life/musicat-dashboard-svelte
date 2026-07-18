@@ -150,7 +150,7 @@
 
 		text-align: center;
 
-		max-width: 1280px;
+		max-width: max(1280px, calc(100vw / 3 * 2));
 	}
 
 	.desc-container {
@@ -161,7 +161,7 @@
 	}
 
 	.thumbnail-container {
-		height: 100%;
+		flex-grow: 1;
 	}
 
 	.thumbnail-container img {
@@ -173,7 +173,8 @@
 	.controls {
 		position: sticky;
 		bottom: 0;
-		height: calc(100% / 5);
+		max-height: calc(100% / 5);
+		height: 100%;
 
 		width: 100%;
 
@@ -236,7 +237,7 @@
 	.glass-card {
 		box-sizing: border-box;
 		width: 100%;
-		height: calc(100% / 3 * 2);
+		min-height: calc(100% / 3 * 2);
 		background: rgba(255, 255, 255, 0.05);
 		backdrop-filter: blur(5px);
 		-webkit-backdrop-filter: blur(5px);
