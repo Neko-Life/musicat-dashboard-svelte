@@ -143,50 +143,49 @@ export class WSCon {
 			newAudio.pause();
 		};
 		newAudio.addEventListener('stalled', stallHandler);
-		const timeupdateHandler = () => {
+		const progressHandler = () => {
 			// unpause if paused
 			if (newAudio.paused && audioElIsBuffered(newAudio)) {
 				newAudio.play();
 			}
 		};
-		newAudio.addEventListener('timeupdate', timeupdateHandler);
+		newAudio.addEventListener('progress', progressHandler);
 
 		document.body.appendChild(newAudio);
 		newAudio.load();
 		this.audioEl = newAudio;
 
 		if (!DEBUG_LOG && !this.debugMode) return;
-		const getLog =
-			(n: string) =>
-			(...args: any[]) =>
-				console.log(n, { params: args });
+		const getLog = (n: string) =>
+			[n, (...args) => console.debug(n, { params: args })] satisfies Parameters<
+				HTMLAudioElement['addEventListener']
+			>;
 
-		newAudio.addEventListener('durationchange', getLog('durationchange'));
-		newAudio.addEventListener('pause', getLog('pause'));
-		newAudio.addEventListener('ended', getLog('ended'));
-		newAudio.addEventListener('abort', getLog('abort'));
-		newAudio.addEventListener('canplay', getLog('canplay'));
-		newAudio.addEventListener('emptied', getLog('emptied'));
-		newAudio.addEventListener('encrypted', getLog('encrypted'));
-		newAudio.addEventListener('error', getLog('error'));
-		newAudio.addEventListener('loadeddata', getLog('loadeddata'));
-		newAudio.addEventListener('loadedmetadata', getLog('loadedmetadata'));
-		newAudio.addEventListener('loadstart', getLog('loadstart'));
-		newAudio.addEventListener('play', getLog('play'));
-		newAudio.addEventListener('playing', getLog('playing'));
-		newAudio.addEventListener('progress', getLog('progress'));
-		newAudio.addEventListener('ratechange', getLog('ratechange'));
-		newAudio.addEventListener('seeked', getLog('seeked'));
-		newAudio.addEventListener('seeking', getLog('seeking'));
-		newAudio.addEventListener('suspend', getLog('suspend'));
+		newAudio.addEventListener(...getLog('durationchange'));
+		newAudio.addEventListener(...getLog('pause'));
+		newAudio.addEventListener(...getLog('ended'));
+		newAudio.addEventListener(...getLog('abort'));
+		newAudio.addEventListener(...getLog('canplay'));
+		newAudio.addEventListener(...getLog('emptied'));
+		newAudio.addEventListener(...getLog('encrypted'));
+		newAudio.addEventListener(...getLog('error'));
+		newAudio.addEventListener(...getLog('loadeddata'));
+		newAudio.addEventListener(...getLog('loadedmetadata'));
+		newAudio.addEventListener(...getLog('loadstart'));
+		newAudio.addEventListener(...getLog('play'));
+		newAudio.addEventListener(...getLog('playing'));
+		newAudio.addEventListener(...getLog('ratechange'));
+		newAudio.addEventListener(...getLog('seeked'));
+		newAudio.addEventListener(...getLog('seeking'));
+		newAudio.addEventListener(...getLog('suspend'));
 
 		// use this
-		this.audioEl.addEventListener('timeupdate', getLog('timeupdate'));
+		newAudio.addEventListener(...getLog('timeupdate'));
 		// use this
-		this.audioEl.addEventListener('volumechange', getLog('volumechange'));
+		newAudio.addEventListener(...getLog('volumechange'));
 
-		this.audioEl.addEventListener('waiting', getLog('waiting'));
-		this.audioEl.addEventListener('waitingforkey', getLog('waitingforkey'));
+		newAudio.addEventListener(...getLog('waiting'));
+		newAudio.addEventListener(...getLog('waitingforkey'));
 	}
 
 	setupHandlers() {
