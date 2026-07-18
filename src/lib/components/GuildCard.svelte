@@ -106,8 +106,11 @@
 		overflow: hidden;
 		height: 25px;
 		width: 100%;
-		display: flex;
 		position: relative;
+
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 
 	.guild-card-container:hover .guild-card-description-container {
@@ -117,6 +120,9 @@
 	.guild-card-description {
 		position: relative;
 		width: 100%;
+
+		justify-content: center;
+		display: flex;
 	}
 
 	.guild-card-description-text {
@@ -125,7 +131,7 @@
 		font-weight: 600;
 		white-space: nowrap;
 		min-width: 100%;
-		width: fit-content;
+		min-width: fit-content;
 	}
 
 	.guild-card-container:hover .guild-card-description-text {
