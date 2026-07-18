@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { isOnBrowser } from '$lib/utils/common';
 	import { getWSUrl } from '$lib/utils/services';
-	import { WSCon } from '$lib/WSCon';
+	import { WSCon, type PlaybackInfo } from '$lib/WSCon';
 	import { onMount } from 'svelte';
 
 	let { params } = $props();
@@ -11,7 +10,7 @@
 	let ws: WSCon | undefined;
 	$effect(() => {
 		ws = new WSCon(getWSUrl('/ws/player/' + params.id), params.id);
-		window.ws = ws;
+		(window as any).ws = ws;
 		attachListeners(ws);
 
 		// scroll to bottom
@@ -31,20 +30,24 @@
 	}
 
 	// UI //////////////////////////////////////
-	function getBgColorHint(n?: number) {
+	function getColorHint(n?: number, isBg?: boolean) {
 		if (typeof n !== 'number') return;
-		return `rgba(${n & 0xff0000},${n & 0x00ff00},${n & 0x0000ff},0.075)`;
+		const R = (n & 0xff0000) >> 16;
+		const G = (n & 0x00ff00) >> 8;
+		const B = n & 0x0000ff;
+		return `rgba(${R},${G},${B},${isBg ? '0.075' : '1'})`;
 	}
 
 	$effect(() => {
-		document.body.style['background-image'] = `url(${nowPlaying?.thumbnail || ''})`;
+		document.body.style.backgroundImage = `url(${nowPlaying?.thumbnail || ''})`;
 		document.body.style.setProperty(
 			'--default-color-hint',
-			nowPlaying?.color || document.body.style.getPropertyValue('--default-color-hint')
+			getColorHint(nowPlaying?.color_hint) ||
+				document.body.style.getPropertyValue('--default-color-hint')
 		);
 		document.body.style.setProperty(
 			'--default-bg-color-hint',
-			getBgColorHint(nowPlaying?.color) ||
+			getColorHint(nowPlaying?.color_hint, true) ||
 				document.body.style.getPropertyValue('--default-bg-color-hint')
 		);
 	});
@@ -74,8 +77,8 @@
 
 		gprEl.style['width'] = `100vw`;
 		gprEl.style['height'] = `100vh`;
-		if (gprEl.style['max-width'] != mW) gprEl.style['max-width'] = mW;
-		if (gprEl.style['max-height'] != mH) gprEl.style['max-height'] = mH;
+		if (gprEl.style.maxWidth != mW) gprEl.style.maxWidth = mW;
+		if (gprEl.style.maxHeight != mH) gprEl.style.maxHeight = mH;
 	});
 </script>
 
@@ -87,7 +90,7 @@
 	<div bind:this={gprEl} id="guild-player-root">
 		<div class="content">
 			<div class="thumbnail-container glass-card">
-				<img src={nowPlaying?.thumbnail} />
+				<img src={nowPlaying?.thumbnail} alt="Song Thumbnail" />
 			</div>
 		</div>
 

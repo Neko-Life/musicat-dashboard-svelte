@@ -6,7 +6,7 @@
 
 <div class="page-container">
 	<div class="avatar-container {musicatUser.data?.data.avatar_url.length ? 'active' : ''}">
-		<img loading="lazy" src={musicatUser.data?.data.avatar_url} alt="" width="100%" />
+		<img loading="lazy" src={musicatUser.data?.data.avatar_url} alt="Bot Avatar" width="100%" />
 	</div>
 
 	<div class="desc-container">
