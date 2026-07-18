@@ -29,10 +29,7 @@
 	const origin = $derived($page.url.origin);
 	const handleGetLoginResponse = $derived(
 		getDefaultGetLoginSuccessHandler({
-			origin,
-			cb: () => {
-				loginQueryEnabled = false;
-			}
+			origin
 		})
 	);
 
@@ -90,7 +87,6 @@
 	$effect(() => {
 		if (loginQuery.data) {
 			handleGetLoginResponse(loginQuery.data);
-			loginQueryEnabled = false;
 		}
 	});
 </script>
