@@ -143,13 +143,13 @@ export class WSCon {
 			newAudio.pause();
 		};
 		newAudio.addEventListener('stalled', stallHandler);
-		const progressHandler = () => {
+		const durationchangeHandler = () => {
 			// unpause if paused
 			if (newAudio.paused && audioElIsBuffered(newAudio)) {
 				newAudio.play();
 			}
 		};
-		newAudio.addEventListener('progress', progressHandler);
+		newAudio.addEventListener('durationchange', durationchangeHandler);
 
 		document.body.appendChild(newAudio);
 		newAudio.load();
@@ -161,7 +161,7 @@ export class WSCon {
 				HTMLAudioElement['addEventListener']
 			>;
 
-		newAudio.addEventListener(...getLog('durationchange'));
+		newAudio.addEventListener(...getLog('progress'));
 		newAudio.addEventListener(...getLog('pause'));
 		newAudio.addEventListener(...getLog('ended'));
 		newAudio.addEventListener(...getLog('abort'));
