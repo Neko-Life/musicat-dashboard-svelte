@@ -1,5 +1,5 @@
 <script lang="ts">
-	let { fill = 'white', ...props }: { fill: string; [k: string]: any } = $props();
+	let { fill = 'white', ...props }: { fill?: string; [k: string]: any } = $props();
 </script>
 
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="fill: {fill};" {...props}

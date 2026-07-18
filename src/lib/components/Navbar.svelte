@@ -15,6 +15,7 @@
 	import ArrowLeftSolid from './icons/ArrowLeftSolid.svelte';
 	import MenuMobile from './Navbar/MenuMobile.svelte';
 	import OuterClick from './Hooks/OuterClick.svelte';
+	import { type Snippet } from 'svelte';
 
 	let showMobileMenus = $state(false);
 
@@ -26,8 +27,8 @@
 
 	const userAvatar: string | undefined = $derived(
 		getUserAvatarLink({
-			userId: $user.id,
-			hash: $user.avatar,
+			userId: $user?.id,
+			hash: $user?.avatar,
 			size: 64
 		})
 	);
@@ -102,11 +103,11 @@
 		>
 			<div class="avatar-button-dropdown-container {avatarDropdownClass}">
 				<div class="btn-logout-container">
-					{@render dropdownBtn()}
+					{@render dropdownBtn?.()}
 				</div>
 			</div>
 
-			<AvatarButton on:click={handleAvatarClick} src={avatarSrc} />
+			<AvatarButton on:click={handleAvatarClick || (() => {})} src={avatarSrc} />
 		</OuterClick>
 	</div>
 {/snippet}
@@ -122,7 +123,7 @@
 		)}
 
 		<div class="menu-list">
-			<button class="mobile-menu-btn" on:click={handleMobileMenuBtnClick}>
+			<button class="mobile-menu-btn" onclick={handleMobileMenuBtnClick}>
 				<BarsSolid width={35} />
 			</button>
 
@@ -156,7 +157,9 @@
 
 <div class="mobile-menus {showMobileMenus ? 'open' : ''}">
 	<div class="mobile-menus-top">
-		<div role="button" on:click={handleMobileMenuBtnClick}>
+		<!-- svelte-ignore a11y_interactive_supports_focus -->
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<div role="button" onclick={handleMobileMenuBtnClick}>
 			<ArrowLeftSolid width={40} />
 		</div>
 
@@ -184,7 +187,7 @@
 <style>
 	#top-navbar {
 		display: flex;
-                justify-content: center;
+		justify-content: center;
 		align-items: center;
 		transition-duration: 2s;
 		position: sticky;
@@ -305,6 +308,7 @@
 		display: none;
 		width: 100%;
 		gap: 8px;
+		justify-content: center;
 	}
 
 	.mobile-menu-btn {

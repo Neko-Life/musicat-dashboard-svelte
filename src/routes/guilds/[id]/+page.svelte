@@ -2,6 +2,9 @@
 	import { getWSUrl } from '$lib/utils/services';
 	import { WSCon, type PlaybackInfo } from '$lib/WSCon';
 	import { onMount } from 'svelte';
+	import useGetMusicatUser from '$lib/queries/useGetMusicatUser';
+
+	const musicatUser = useGetMusicatUser();
 
 	let { params } = $props();
 
@@ -88,13 +91,36 @@
 	class="guild-player-root-container"
 >
 	<div bind:this={gprEl} id="guild-player-root">
-		<div class="content">
-			<div class="thumbnail-container glass-card">
-				<img src={nowPlaying?.thumbnail} alt="Song Thumbnail" />
+		<div class="content-container">
+			<div class="content glass-card">
+				<div class="thumbnail-container">
+					<img
+						src={nowPlaying?.thumbnail || musicatUser?.data?.data?.avatar_url}
+						alt="Song Thumbnail"
+					/>
+				</div>
+				{#if !nowPlaying}
+					<div class="desc-container Author-MediumItalic">
+						<h2>Seems like this guild doesn't have active voice session... 🦗🦗</h2>
+					</div>
+				{:else}
+					<div class="desc-container">
+						<h1 class="desc-title Nippo-Bold">{nowPlaying.title}</h1>
+						<h2 class="desc-user Author-Medium">{nowPlaying.username}</h2>
+					</div>
+				{/if}
 			</div>
 		</div>
 
-		<div class="controls"></div>
+		<div class="controls">
+			<div class="progress-container">
+				<div class="progress-progress">
+					<div class="progress-seek"></div>
+				</div>
+				<div class="progress-left"></div>
+			</div>
+			<div class="controls-content"></div>
+		</div>
 	</div>
 </div>
 
@@ -106,24 +132,42 @@
 		flex-direction: column;
 	}
 
-	.content {
+	.content-container {
 		transition-duration: 2s;
+
 		display: flex;
-		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+
 		height: 100%;
 	}
 
-	.thumbnail-container {
+	.content {
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		flex-direction: column;
+
+		text-align: center;
+
 		max-width: 1280px;
+	}
+
+	.desc-container {
+		padding: 24px;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.thumbnail-container {
+		height: 100%;
 	}
 
 	.thumbnail-container img {
 		height: 100%;
+		box-shadow: var(--default-text-color) 0 0 10px;
+		border: solid 1px var(--default-text-color);
 	}
 
 	.controls {
@@ -135,12 +179,58 @@
 
 		transition-duration: 2s;
 		box-sizing: border-box;
-		display: flex;
-		padding: 16px;
 
-		box-shadow: 0px 0px 50px 0 var(--default-color-hint);
-		background-color: var(--default-bg-color-hint);
+		display: flex;
+		flex-direction: column;
+	}
+
+	.progress-container {
+		display: flex;
+	}
+
+	.progress-progress {
+		width: 33%;
+
+		box-shadow: 0px 0px 50px 8px var(--default-color-hint);
 		border-top: 1px solid var(--default-color-hint);
+
+		display: flex;
+		justify-content: flex-end;
+
+		position: relative;
+	}
+
+	.progress-seek {
+		background-color: var(--default-color-hint);
+		border-radius: 100%;
+
+		position: absolute;
+		transform: translateX(50%) translateY(-50%);
+
+		max-width: 16px;
+		max-height: 16px;
+		width: 0vw;
+		height: 0vh;
+
+		transition-duration: 0.5s;
+	}
+
+	.controls:hover .progress-seek {
+		width: 100vw;
+		height: 100vh;
+	}
+
+	.progress-left {
+		width: 67%;
+		box-shadow: 0px 0px 50px 8px white;
+		border-top: 1px solid white;
+	}
+
+	.controls-content {
+		flex-grow: 1;
+		background-color: var(--default-bg-color-hint);
+
+		padding: 16px;
 	}
 
 	.glass-card {
@@ -188,7 +278,7 @@
 	}
 
 	@media screen and (min-width: 600px) {
-		.content {
+		.content-container {
 			padding: 0 12px;
 		}
 	}

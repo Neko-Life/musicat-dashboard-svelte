@@ -25,6 +25,7 @@
 		outline: none;
 		border: none;
 		padding: 0px;
+		max-width: 200px;
 	}
 
 	.menu-container * {
@@ -52,8 +53,8 @@
 	.menu-container.active .menu,
 	.menu-container:active .menu {
 		box-shadow:
-			inset 44px 0px 20px -25px white,
-			inset -44px 0px 20px -25px white;
+			inset 44px 0px 20px -40px white,
+			inset -44px 0px 20px -40px white;
 	}
 
 	.menu-container.active .menu {

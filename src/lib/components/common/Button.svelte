@@ -1,5 +1,5 @@
 <script lang="ts">
-	let { disabled = false, ...props }: { disabled: boolean; [k: string]: any } = $props();
+	let { disabled = false, ...props }: { disabled?: boolean; [k: string]: any } = $props();
 </script>
 
 <button class="btn {props.class || ''}" on:click {disabled}>

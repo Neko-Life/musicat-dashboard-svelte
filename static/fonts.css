@@ -1,0 +1,28 @@
+@import 'fonts/Chillax/css/chillax.css';
+@import 'fonts/Author/css/author.css';
+@import 'fonts/Nippo/css/nippo.css';
+
+.Author-Regular,
+.Author-Regular * {
+	font-family: 'Author-Regular';
+}
+
+.Author-Medium,
+.Author-Medium * {
+	font-family: 'Author-Medium';
+}
+
+.Author-MediumItalic,
+.Author-MediumItalic * {
+	font-family: 'Author-MediumItalic';
+}
+
+.Author-Bold,
+.Author-Bold * {
+	font-family: 'Author-Bold';
+}
+
+.Nippo-Bold,
+.Nippo-Bold * {
+	font-family: 'Nippo-Bold';
+}

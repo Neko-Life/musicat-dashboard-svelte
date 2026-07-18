@@ -1,6 +1,13 @@
+@import 'fonts.css';
+
 * {
 	color: var(--default-text-color);
 	margin: 0;
+	font-family: 'Chillax-Semibold';
+}
+
+p {
+	font-family: 'Chillax-Medium';
 }
 
 body {
