@@ -45,29 +45,6 @@
 	}
 
 	// UI //////////////////////////////////////
-	function getColorHint(n?: number, isBg?: boolean) {
-		if (typeof n !== 'number') return;
-		const R = (n & 0xff0000) >> 16;
-		const G = (n & 0x00ff00) >> 8;
-		const B = n & 0x0000ff;
-		return `rgba(${R},${G},${B},${isBg ? '0.075' : '1'})`;
-	}
-
-	$effect(() => {
-		// keep previous style
-		if (!nowPlaying?.title) return;
-		document.body.style.backgroundImage = `url(${nowPlaying.thumbnail || ''})`;
-		document.body.style.setProperty(
-			'--default-color-hint',
-			getColorHint(nowPlaying.color_hint) ||
-				document.body.style.getPropertyValue('--default-color-hint')
-		);
-		document.body.style.setProperty(
-			'--default-bg-color-hint',
-			getColorHint(nowPlaying.color_hint, true) ||
-				document.body.style.getPropertyValue('--default-bg-color-hint')
-		);
-	});
 
 	function getExpectedGPRDimension() {
 		const navBarEl: HTMLElement | null = document.querySelector('#top-navbar');

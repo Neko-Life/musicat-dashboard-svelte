@@ -13,6 +13,7 @@ export interface PlaybackInfo {
 	auto_play: boolean;
 	avatar: string;
 	average_bitrate: number;
+	// color_hint will always exist when other property might be not
 	color_hint: number;
 	desc: string;
 	// in ms
@@ -66,6 +67,32 @@ function elIsValidNode(el: any): el is HTMLElement {
 
 function audioElIsBuffered(audioEl: HTMLAudioElement) {
 	return audioEl.readyState === HTMLMediaElement.HAVE_ENOUGH_DATA;
+}
+
+function getColorHint(n?: number, isBg?: boolean) {
+	if (typeof n !== 'number') return;
+	const R = (n & 0xff0000) >> 16;
+	const G = (n & 0x00ff00) >> 8;
+	const B = n & 0x0000ff;
+	return `rgba(${R},${G},${B},${isBg ? '0.075' : '1'})`;
+}
+
+function setColorHint(nowPlaying?: PlaybackInfo) {
+	if (typeof nowPlaying?.color_hint !== 'number') return;
+	document.body.style.setProperty(
+		'--default-color-hint',
+		getColorHint(nowPlaying.color_hint) ||
+			document.body.style.getPropertyValue('--default-color-hint')
+	);
+	document.body.style.setProperty(
+		'--default-bg-color-hint',
+		getColorHint(nowPlaying.color_hint, true) ||
+			document.body.style.getPropertyValue('--default-bg-color-hint')
+	);
+
+	// keep previous style
+	if (!nowPlaying.thumbnail) return;
+	document.body.style.backgroundImage = `url(${nowPlaying.thumbnail || ''})`;
 }
 
 export class WSCon {
@@ -246,6 +273,7 @@ export class WSCon {
 
 	handlePlaybackInfo(d: PlaybackInfo) {
 		this.resetAudioElement();
+		setColorHint(d);
 		this.on?.playbackInfo?.(d);
 		if (!d) return;
 		this.createAudioElement();
