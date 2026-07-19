@@ -22,7 +22,19 @@
 			1000
 		);
 	});
-	onMount(() => ws?.onMount());
+
+	function orientationChangeHandler() {
+		setTimeout(calcGPRDimension, 100);
+	}
+	onMount(() => {
+		const wsUnmount = ws?.onMount();
+		window.screen.orientation.addEventListener('change', orientationChangeHandler);
+
+		return () => {
+			window.screen.orientation.removeEventListener('change', orientationChangeHandler);
+			wsUnmount?.();
+		};
+	});
 
 	let nowPlaying: PlaybackInfo | undefined | null = $state();
 
@@ -43,7 +55,7 @@
 
 	$effect(() => {
 		// keep previous style
-		if (!nowPlaying) return;
+		if (!nowPlaying?.title) return;
 		document.body.style.backgroundImage = `url(${nowPlaying.thumbnail || ''})`;
 		document.body.style.setProperty(
 			'--default-color-hint',
@@ -72,8 +84,8 @@
 	let gprContainerClientHeight: number = $state(0);
 	let gprEl: HTMLDivElement | undefined;
 
-	$effect(() => {
-		if (!gprContainerClientWidth || !gprContainerClientHeight || !gprEl) return;
+	function calcGPRDimension() {
+		if (!gprEl) return;
 		const [w, h] = getExpectedGPRDimension();
 		if (!w || !h) return;
 
@@ -84,6 +96,11 @@
 		gprEl.style['height'] = `100vh`;
 		if (gprEl.style.maxWidth != mW) gprEl.style.maxWidth = mW;
 		if (gprEl.style.maxHeight != mH) gprEl.style.maxHeight = mH;
+	}
+
+	$effect(() => {
+		if (!gprContainerClientWidth || !gprContainerClientHeight || !gprEl) return;
+		calcGPRDimension();
 	});
 </script>
 
@@ -101,7 +118,7 @@
 						alt="Song Thumbnail"
 					/>
 				</div>
-				{#if !nowPlaying}
+				{#if !nowPlaying?.title}
 					<div class="desc-container Author-MediumItalic">
 						<h2>Seems like this guild doesn't have an active voice session... 🦗🦗</h2>
 					</div>
@@ -136,7 +153,7 @@
 						</div>
 						<div class="play-stop play">
 							<div class="icon">
-								{#if nowPlaying}
+								{#if nowPlaying?.title}
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"
 										><!--!Font Awesome Free v7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path
 											d="M176 96C149.5 96 128 117.5 128 144L128 496C128 522.5 149.5 544 176 544L240 544C266.5 544 288 522.5 288 496L288 144C288 117.5 266.5 96 240 96L176 96zM400 96C373.5 96 352 117.5 352 144L352 496C352 522.5 373.5 544 400 544L464 544C490.5 544 512 522.5 512 496L512 144C512 117.5 490.5 96 464 96L400 96z"
@@ -185,6 +202,10 @@
 		flex-direction: column;
 	}
 
+	.guild-player-root-container {
+		height: 100%;
+	}
+
 	.content-container {
 		transition-duration: 2s;
 
@@ -193,13 +214,14 @@
 		align-items: center;
 
 		height: 100%;
+		max-height: calc(100% - 82px);
 	}
 
 	.content {
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		flex-direction: column;
+		flex-direction: row;
 
 		text-align: center;
 
@@ -215,7 +237,7 @@
 
 	.thumbnail-container {
 		max-width: 100%;
-		width: 100%;
+		height: 100%;
 
 		flex-grow: 1;
 	}
@@ -232,8 +254,9 @@
 	.controls-container {
 		position: sticky;
 		bottom: 0;
-		height: calc(100% / 6);
 
+		height: calc(100% / 6);
+		min-height: 82px;
 		width: 100%;
 
 		box-sizing: border-box;
@@ -340,16 +363,18 @@
 
 	.play-seek-container > .seek {
 		height: 50%;
+		min-height: 36px;
 	}
 
 	.play-seek-container > .play-stop {
 		height: 75%;
+		min-height: 50px;
 	}
 
 	.glass-card {
 		box-sizing: border-box;
 		width: 100%;
-		min-height: calc(100% / 5 * 4);
+		height: calc(100% / 5 * 4);
 		background: rgba(255, 255, 255, 0.05);
 		backdrop-filter: blur(5px);
 		-webkit-backdrop-filter: blur(5px);
@@ -393,6 +418,16 @@
 	@media screen and (min-width: 600px) {
 		.content-container {
 			padding: 0 12px;
+		}
+	}
+
+	@media screen and (min-height: 720px) {
+		.thumbnail-container {
+			width: 100%;
+		}
+
+		.content {
+			flex-direction: column;
 		}
 	}
 </style>
