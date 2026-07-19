@@ -42,15 +42,17 @@
 	}
 
 	$effect(() => {
-		document.body.style.backgroundImage = `url(${nowPlaying?.thumbnail || ''})`;
+		// keep previous style
+		if (!nowPlaying) return;
+		document.body.style.backgroundImage = `url(${nowPlaying.thumbnail || ''})`;
 		document.body.style.setProperty(
 			'--default-color-hint',
-			getColorHint(nowPlaying?.color_hint) ||
+			getColorHint(nowPlaying.color_hint) ||
 				document.body.style.getPropertyValue('--default-color-hint')
 		);
 		document.body.style.setProperty(
 			'--default-bg-color-hint',
-			getColorHint(nowPlaying?.color_hint, true) ||
+			getColorHint(nowPlaying.color_hint, true) ||
 				document.body.style.getPropertyValue('--default-bg-color-hint')
 		);
 	});
@@ -60,7 +62,7 @@
 		if (!navBarEl) return [0, 0];
 
 		const screenW = document.body.clientWidth;
-		const screenH = window.screen.height;
+		const screenH = window.visualViewport?.height || 0;
 
 		const nH = screenH - navBarEl.clientHeight;
 		return [screenW > 0 ? screenW : 0, nH > 0 ? nH : 0];
@@ -179,12 +181,11 @@
 	.controls {
 		position: sticky;
 		bottom: 0;
-		max-height: calc(100% / 5);
+		max-height: calc(100% / 6);
 		height: 100%;
 
 		width: 100%;
 
-		transition-duration: 2s;
 		box-sizing: border-box;
 
 		display: flex;
@@ -193,6 +194,11 @@
 
 	.progress-container {
 		display: flex;
+	}
+
+	.controls-content,
+	.progress-container * {
+		transition-duration: 10s;
 	}
 
 	.progress-progress {
@@ -243,7 +249,7 @@
 	.glass-card {
 		box-sizing: border-box;
 		width: 100%;
-		min-height: calc(100% / 4 * 3);
+		min-height: calc(100% / 5 * 4);
 		background: rgba(255, 255, 255, 0.05);
 		backdrop-filter: blur(5px);
 		-webkit-backdrop-filter: blur(5px);

@@ -189,7 +189,6 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		transition-duration: 2s;
 		position: sticky;
 		top: 0;
 		z-index: 5;
@@ -283,6 +282,8 @@
 
 	.mobile-menus-top,
 	#top-navbar {
+		transition-duration: 10s;
+
 		box-shadow: 0px 0px 50px 0 var(--default-color-hint);
 		background-color: var(--default-bg-color-hint);
 		border-bottom: 1px solid var(--default-color-hint);
