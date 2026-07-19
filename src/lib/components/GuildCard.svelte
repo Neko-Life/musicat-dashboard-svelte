@@ -29,7 +29,7 @@
 	<div class="guild-icon-container">
 		{#if guild.has_active_voice_session}
 			<div class="icon-decoration">
-				<DotLottieSvelte src="anims/Voice.lottie" loop autoplay />
+				<DotLottieSvelte src="anims/Voice-white.lottie" loop autoplay />
 			</div>
 		{/if}
 		<div class="img-container">
