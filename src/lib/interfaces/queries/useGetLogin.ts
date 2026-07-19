@@ -6,6 +6,5 @@ export interface IUseGetLoginParams {
 
 export interface IGetDefaultGetLoginSuccessHandlerParams {
 	origin: string;
-	goto: typeof import('$app/navigation')['goto'];
 	cb?: () => void;
 }
