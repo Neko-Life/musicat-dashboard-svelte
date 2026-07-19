@@ -2,7 +2,7 @@
 	import type { IUserGuild } from '$lib/interfaces/services/general';
 	import { getGuildIconLink } from '$lib/utils/guild';
 	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
+	import { DotLottieSvelte } from '@lottiefiles/dotlottie-svelte';
 
 	let { guild }: { guild: IUserGuild } = $props();
 
@@ -23,15 +23,18 @@
 
 		return () => (shouldSlide = false);
 	});
-
-	function handleClick() {
-		goto('/guilds/' + guild.id);
-	}
 </script>
 
-<button class="guild-card-container" on:click={handleClick}>
-	<div class="img-container">
-		<img class={classNames} loading="lazy" {src} alt="Guild Icon" />
+<a href="/guilds/{guild.id}" class="guild-card-container">
+	<div class="guild-icon-container">
+		{#if guild.has_active_voice_session}
+			<div class="icon-decoration">
+				<DotLottieSvelte src="anims/Voice.lottie" loop autoplay />
+			</div>
+		{/if}
+		<div class="img-container">
+			<img class={classNames} loading="lazy" {src} alt="Guild Icon" />
+		</div>
 	</div>
 
 	<div bind:this={descriptionContainerEl} class="guild-card-description-container">
@@ -45,7 +48,7 @@
 			</div>
 		</div>
 	</div>
-</button>
+</a>
 
 <style>
 	.guild-card-container {
@@ -61,6 +64,7 @@
 		background-color: transparent;
 		outline: none;
 		align-items: center;
+		text-decoration: none;
 	}
 
 	.guild-card-container:hover {
@@ -151,6 +155,21 @@
 
 	.guild-card-description.slide .guild-card-description-text {
 		animation: text-slide 10s ease-in-out infinite alternate;
+	}
+
+	.guild-icon-container {
+		position: relative;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		aspect-ratio: 1 / 1;
+		width: 100%;
+	}
+
+	.icon-decoration {
+		position: absolute;
+		width: calc(100% + 30%);
+		height: calc(100% + 68%);
 	}
 
 	img.non-mutual {

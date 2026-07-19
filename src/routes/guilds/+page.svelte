@@ -13,9 +13,12 @@
 		if (newPerPage < 1) newPerPage = 1;
 		const setGridCol = `repeat(${widthFor}, 1fr)`;
 
+		console.log({ perPage, newPerPage, widthFor, heightFor });
+		if (perPage == 90) return;
 		if (perPage != newPerPage) perPage = newPerPage;
-		if (guildListContainerEl.style['grid-template-columns'] != setGridCol)
-			guildListContainerEl.style['grid-template-columns'] = setGridCol;
+		if (!guildListContainerEl) return;
+		if (guildListContainerEl.style.gridTemplateColumns != setGridCol)
+			guildListContainerEl.style.gridTemplateColumns = setGridCol;
 	}
 
 	function getCardGap() {
@@ -41,30 +44,10 @@
 
 		const cardGap = getCardGap();
 
-		let widthFor = 0;
-		let heightFor = 0;
-
-		while (true) {
-			const nW = widthFor + 1;
-			const sumGap = (nW - 1) * cardGap;
-			const sumW = sumGap + nW * guildCardWidth + guildListXPadding;
-			if (sumW < guildListContainerWidth) {
-				widthFor = nW;
-				continue;
-			}
-			break;
-		}
-
-		while (true) {
-			const nH = heightFor + 1;
-			const sumGap = (nH - 1) * cardGap;
-			const sumH = sumGap + nH * guildCardHeight + guildListYPadding;
-			if (sumH < guildListContainerHeight) {
-				heightFor = nH;
-				continue;
-			}
-			break;
-		}
+		const availableX = guildListContainerWidth - guildListXPadding;
+		const widthFor = Math.floor((availableX + cardGap) / (cardGap + guildCardWidth));
+		const availableY = guildListContainerHeight - guildListYPadding;
+		const heightFor = Math.floor((availableY + cardGap) / (cardGap + guildCardHeight));
 
 		setGuildPerPage(widthFor, heightFor);
 	}
@@ -91,6 +74,10 @@
 					search.length ? v.name.toLocaleLowerCase().includes(searchLowCase) : true
 				)
 				.sort((a, b) => {
+					// [has_active_voice_session, is_mutual, else]
+					if (a.has_active_voice_session && !b.has_active_voice_session) return -1;
+					if (!a.has_active_voice_session && b.has_active_voice_session) return 1;
+
 					if (a.is_mutual && !b.is_mutual) return -1;
 					if (!a.is_mutual && b.is_mutual) return 1;
 

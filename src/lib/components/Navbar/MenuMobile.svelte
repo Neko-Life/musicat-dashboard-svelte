@@ -1,8 +1,8 @@
 <script lang="ts">
-	let { active, ...props } = $props();
+	let { active, href, ...props } = $props();
 </script>
 
-<button class="menu-container {props.class || ''} {active ? 'active' : ''}" on:click>
+<a {href} class="menu-container {props.class || ''} {active ? 'active' : ''}" on:click>
 	<!--
 	<div class="glow left" />
         -->
@@ -12,7 +12,7 @@
 	<!--
 	<div class="glow right" />
         -->
-</button>
+</a>
 
 <style>
 	.menu-container {
@@ -24,10 +24,13 @@
 		border: none;
 		padding: 16px 24px;
 		transition-duration: 0.2s;
+		text-decoration: none;
 	}
 
 	.menu-container:active {
-		box-shadow: inset 10px 0px 40px -10px blue, inset -10px 0px 40px -10px blue;
+		box-shadow:
+			inset 10px 0px 40px -10px var(--default-color-hint),
+			inset -10px 0px 40px -10px var(--default-color-hint);
 	}
 
 	.menu {

@@ -137,6 +137,18 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
+"@lottiefiles/dotlottie-svelte@^0.10.9":
+  version "0.10.9"
+  resolved "https://registry.yarnpkg.com/@lottiefiles/dotlottie-svelte/-/dotlottie-svelte-0.10.9.tgz#385be43ed637d43ec0cb14116cdb3a9a5d44f20a"
+  integrity sha512-dvznqPpnmXpfmy+nNLCRDnSmvoxgJU5tMMm64nnk4BJ3ArFznP7cDyfXa+Nf1QpiN77JRcEeoZtW5siyzo85rQ==
+  dependencies:
+    "@lottiefiles/dotlottie-web" "0.78.0"
+
+"@lottiefiles/dotlottie-web@0.78.0":
+  version "0.78.0"
+  resolved "https://registry.yarnpkg.com/@lottiefiles/dotlottie-web/-/dotlottie-web-0.78.0.tgz#472f4d6d8d77f919620369ecca0621863b1b63b6"
+  integrity sha512-vGF+sZfcDcgWnebMpZtZVkTMA3EvV+X63QjFnHQFSc/7S3YUAoYkLEpoBA7CoV3jU1AmDKV7pAqUPKzxel3Ohw==
+
 "@napi-rs/wasm-runtime@^1.1.6":
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/@napi-rs/wasm-runtime/-/wasm-runtime-1.1.6.tgz#ed33806d0f9be98dc76d0c3d4fd872fda701b5d5"

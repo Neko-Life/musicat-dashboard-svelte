@@ -1,5 +1,5 @@
 <script lang="ts">
-	let { src, ...props }: { src: string | undefined; [k: string]: any } = $props();
+	let { src, ...props }: { src?: string; [k: string]: any } = $props();
 </script>
 
 <button class="avatar {props.class || ''}" on:click>

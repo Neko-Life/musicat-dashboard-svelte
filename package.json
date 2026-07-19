@@ -14,6 +14,7 @@
 	"devDependencies": {
 		"@sveltejs/adapter-node": "^5.5.7",
 		"@sveltejs/kit": "^2.69.2",
+		"@sveltejs/vite-plugin-svelte": "^7.1.2",
 		"@typescript-eslint/eslint-plugin": "^8.63.0",
 		"@typescript-eslint/parser": "^8.63.0",
 		"eslint": "^10.7.0",
@@ -25,11 +26,11 @@
 		"svelte-check": "^4.7.2",
 		"tslib": "^2.4.1",
 		"typescript": "^7.0.2",
-		"vite": "^8.1.4",
-		"@sveltejs/vite-plugin-svelte": "^7.1.2"
+		"vite": "^8.1.4"
 	},
 	"type": "module",
 	"dependencies": {
+		"@lottiefiles/dotlottie-svelte": "^0.10.9",
 		"@tanstack/svelte-query": "^6.1.36"
 	},
 	"packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"

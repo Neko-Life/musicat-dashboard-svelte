@@ -1,8 +1,9 @@
 <script lang="ts">
-	let { active, ...props }: { active: boolean | undefined; [k: string]: any } = $props();
+	let { active, href, ...props }: { active?: boolean; href?: string; [k: string]: any } =
+		$props();
 </script>
 
-<button class="menu-container {props.class || ''} {active ? 'active' : ''}" on:click>
+<a {href} class="menu-container {props.class || ''} {active ? 'active' : ''}" on:click>
 	<!--
 	<div class="glow left" />
         -->
@@ -14,7 +15,7 @@
 	<!--
 	<div class="glow right" />
         -->
-</button>
+</a>
 
 <style>
 	.menu-container {
@@ -26,6 +27,7 @@
 		border: none;
 		padding: 0px;
 		max-width: 200px;
+		text-decoration: none;
 	}
 
 	.menu-container * {

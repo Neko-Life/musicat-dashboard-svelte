@@ -1,15 +1,24 @@
 <script lang="ts">
-	let { disabled = false, ...props }: { disabled?: boolean; [k: string]: any } = $props();
+	let {
+		disabled = false,
+		href,
+		...props
+	}: { disabled?: boolean; href?: string; [k: string]: any } = $props();
 </script>
 
-<button class="btn {props.class || ''}" on:click {disabled}>
+<a {href} class="btn {props.class || ''}" on:click {disabled}>
 	<slot />
-</button>
+</a>
 
 <style>
+	.btn {
+		color: var(--default-bg-body);
+	}
+
 	.btn-login {
 		padding: 8px 12px;
 		box-shadow: 0px 0px 10px 1px rgba(255, 255, 255, 0.5);
+		text-decoration: none;
 	}
 
 	@media (min-width: 480px) {

@@ -18,5 +18,8 @@ export default defineConfig({
 			adapter: adapter(),
 			preprocess: [vitePreprocess()]
 		})
-	]
+	],
+	optimizeDeps: {
+		exclude: ['layercake']
+	}
 });

@@ -17,4 +17,5 @@ export interface IUserGuild {
 	 * empty value indicates server error
 	 */
 	is_mutual?: boolean;
+	has_active_voice_session?: boolean;
 }

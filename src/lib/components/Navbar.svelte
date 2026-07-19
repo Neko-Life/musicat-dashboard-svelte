@@ -67,12 +67,7 @@
 		mcAvatarMobileDropdownClass = mcAvatarMobileDropdownClass.length ? '' : 'show';
 	};
 
-	const handleInviteClick = () => {
-		goto('/login?' + createLoginRedirectParam($page.url.pathname) + '&invite=1');
-	};
-
-	const handleMenuClick = (menu: (typeof menuList)[number], isMobile?: boolean) => {
-		goto(menu.path);
+	const handleMenuClick = (_menu: (typeof menuList)[number], isMobile?: boolean) => {
 		if (isMobile) handleMobileMenuBtnClick();
 	};
 
@@ -82,7 +77,10 @@
 </script>
 
 {#snippet musicatInviteBtn()}
-	<Button class="btn-login" on:click={handleInviteClick}>Invite</Button>
+	<Button
+		href={'/login?' + createLoginRedirectParam($page.url.pathname) + '&invite=1'}
+		class="btn-login">Invite</Button
+	>
 {/snippet}
 
 {#snippet logoutBtn()}
@@ -132,6 +130,7 @@
 					<Menu
 						on:click={() => handleMenuClick(menu)}
 						active={matchPath(menu.path, $page.url.pathname)}
+						href={menu.path}
 					>
 						<span class="menu-name">{menu.name}</span>
 					</Menu>
@@ -177,6 +176,7 @@
 			<MenuMobile
 				on:click={() => handleMenuClick(menu, true)}
 				active={matchPath(menu.path, $page.url.pathname)}
+				href={menu.path}
 			>
 				<span class="menu-name">{menu.name}</span>
 			</MenuMobile>
@@ -272,7 +272,7 @@
 		width: 100vw;
 		height: 100vh;
 		z-index: 100;
-		background-color: black;
+		background-color: var(--default-bg-body);
 		transition-duration: 300ms;
 	}
 
