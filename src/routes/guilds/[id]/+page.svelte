@@ -161,11 +161,17 @@
 	}
 
 	.thumbnail-container {
+		max-width: 100%;
+		width: 100%;
+
 		flex-grow: 1;
 	}
 
 	.thumbnail-container img {
 		height: 100%;
+		max-width: 100%;
+		object-fit: contain;
+
 		box-shadow: var(--default-text-color) 0 0 10px;
 		border: solid 1px var(--default-text-color);
 	}
@@ -237,7 +243,7 @@
 	.glass-card {
 		box-sizing: border-box;
 		width: 100%;
-		min-height: calc(100% / 3 * 2);
+		min-height: calc(100% / 4 * 3);
 		background: rgba(255, 255, 255, 0.05);
 		backdrop-filter: blur(5px);
 		-webkit-backdrop-filter: blur(5px);
