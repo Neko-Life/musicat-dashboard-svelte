@@ -1,12 +1,8 @@
 <script lang="ts">
-	let {
-		disabled = false,
-		href,
-		...props
-	}: { disabled?: boolean; href?: string; [k: string]: any } = $props();
+	let { href, ...props }: { href?: string; [k: string]: any } = $props();
 </script>
 
-<a {href} class="btn {props.class || ''}" on:click {disabled}>
+<a {href} class="btn {props.class || ''}" on:click>
 	<slot />
 </a>
 
