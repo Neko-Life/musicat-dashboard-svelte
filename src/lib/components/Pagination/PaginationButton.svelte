@@ -8,13 +8,13 @@
 		inputPage = false,
 		onPageClick
 	}: {
-		index: number;
-		inputPage: boolean;
+		index?: number;
+		inputPage?: boolean;
 
 		/**
 		 * Should return 0 if continue, 1 if return after call
 		 */
-		onPageClick: ((page: number) => 0 | 1) | undefined;
+		onPageClick?: (page: number) => 0 | 1;
 	} = $props();
 	let inputPageValue = $state('');
 

@@ -8,17 +8,23 @@
 	let search = $state('');
 	let perPage = $state(1);
 
-	function setGuildPerPage(widthFor: number, heightFor: number) {
+	function setGuildPerPage(widthFor: number, heightFor: number): boolean {
+		if (widthFor === Infinity) widthFor = 2;
+		if (heightFor === Infinity) heightFor = 5;
 		let newPerPage = widthFor * heightFor;
-		if (newPerPage < 1) newPerPage = 1;
+		if (newPerPage < 10) newPerPage = 10;
 		const setGridCol = `repeat(${widthFor}, 1fr)`;
 
-		console.log({ perPage, newPerPage, widthFor, heightFor });
-		if (perPage == 90) return;
-		if (perPage != newPerPage) perPage = newPerPage;
-		if (!guildListContainerEl) return;
+		let ret = false;
+		if (perPage != newPerPage) {
+			perPage = newPerPage;
+			ret = true;
+		}
+		if (!guildListContainerEl) return ret;
 		if (guildListContainerEl.style.gridTemplateColumns != setGridCol)
 			guildListContainerEl.style.gridTemplateColumns = setGridCol;
+
+		return ret;
 	}
 
 	function getCardGap() {
@@ -35,6 +41,8 @@
 	let guildListContainerHeight: number = $state(0);
 	let guildCardWidth: number = $state(0);
 	let guildCardHeight: number = $state(0);
+	let widthFor: number = $state(0);
+	let heightFor: number = $state(0);
 
 	function calcAvailableSpace() {
 		if (document.body.clientWidth < 242) return setGuildPerPage(1, 10);
@@ -44,12 +52,23 @@
 
 		const cardGap = getCardGap();
 
-		const availableX = guildListContainerWidth - guildListXPadding;
-		const widthFor = Math.floor((availableX + cardGap) / (cardGap + guildCardWidth));
-		const availableY = guildListContainerHeight - guildListYPadding;
-		const heightFor = Math.floor((availableY + cardGap) / (cardGap + guildCardHeight));
+		if (guildListContainerWidth > (window.visualViewport?.width || 0)) {
+			setGuildPerPage(widthFor - 2, heightFor);
+			return;
+		}
+		if (guildListContainerHeight > (document.body.clientHeight || 0)) {
+			setGuildPerPage(widthFor, heightFor - 2);
+			return;
+		}
 
-		setGuildPerPage(widthFor, heightFor);
+		const availableX = guildListContainerWidth - guildListXPadding;
+		const availableY = guildListContainerHeight - guildListYPadding;
+		widthFor = Math.floor((availableX + cardGap) / (cardGap + guildCardWidth));
+		heightFor = Math.floor((availableY + cardGap) / (cardGap + guildCardHeight));
+		console.log({ availableX, availableY, widthFor, heightFor });
+
+		if (!setGuildPerPage(widthFor, heightFor)) return;
+		setTimeout(calcAvailableSpace, 100);
 	}
 
 	$effect(() => {
@@ -105,7 +124,17 @@
 		return guildList.filter((_v, i) => i >= filterIndexes - perPage && i < filterIndexes);
 	});
 
-	onMount(() => () => ($pagination = undefined));
+	function orientationChangeHandler() {
+		setTimeout(calcAvailableSpace, 100);
+	}
+	onMount(() => {
+		window.screen.orientation.addEventListener('change', orientationChangeHandler);
+
+		return () => {
+			window.screen.orientation.removeEventListener('change', orientationChangeHandler);
+			$pagination = undefined;
+		};
+	});
 </script>
 
 <div class="flex-center top-section"></div>
