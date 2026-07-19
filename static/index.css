@@ -19,7 +19,7 @@ body {
 	overflow-x: hidden;
 	background-repeat: no-repeat;
 	background-size: cover;
-	background-position: bottom;
+	background-position: center;
 }
 
 body.dark {
