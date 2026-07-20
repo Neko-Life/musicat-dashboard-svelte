@@ -65,7 +65,6 @@
 		const availableY = guildListContainerHeight - guildListYPadding;
 		widthFor = Math.floor((availableX + cardGap) / (cardGap + guildCardWidth));
 		heightFor = Math.floor((availableY + cardGap) / (cardGap + guildCardHeight));
-		console.log({ availableX, availableY, widthFor, heightFor });
 
 		if (!setGuildPerPage(widthFor, heightFor)) return;
 		setTimeout(calcAvailableSpace, 100);

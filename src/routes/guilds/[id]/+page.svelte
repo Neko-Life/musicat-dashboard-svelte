@@ -215,8 +215,6 @@
 	.thumbnail-container {
 		max-width: 100%;
 		height: 100%;
-
-		flex-grow: 1;
 	}
 
 	.thumbnail-container img {
@@ -401,6 +399,7 @@
 	@media screen and (min-height: 720px) {
 		.thumbnail-container {
 			width: 100%;
+			flex-grow: 1;
 		}
 
 		.content {
