@@ -275,7 +275,7 @@ export class WSCon {
 		this.resetAudioElement();
 		setColorHint(d);
 		this.on?.playbackInfo?.(d);
-		if (!d) return;
+		if (!d?.title) return;
 		this.createAudioElement();
 	}
 
