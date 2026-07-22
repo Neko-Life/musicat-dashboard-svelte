@@ -324,7 +324,9 @@ export class WSCon {
 				this.handlePlaybackInfo(json.d);
 				break;
 			case EventTypeE.PLAY:
-				this.audioEl?.load();
+				if (this.audioEl?.paused) this.audioEl.play();
+				if ((this.audioEl?.readyState || 0) < HTMLMediaElement.HAVE_ENOUGH_DATA)
+					this.audioEl?.load();
 				this.on.play?.();
 				break;
 			case EventTypeE.SEEK:
