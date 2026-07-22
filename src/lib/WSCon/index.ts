@@ -228,7 +228,6 @@ export class WSCon {
 		newAudio.addEventListener('progress', durationchangeHandler);
 
 		document.body.appendChild(newAudio);
-		newAudio.load();
 		this.audioEl = newAudio;
 
 		if (!DEBUG_LOG && !this.debugMode) return;
@@ -325,6 +324,7 @@ export class WSCon {
 				this.handlePlaybackInfo(json.d);
 				break;
 			case EventTypeE.PLAY:
+				this.audioEl?.load();
 				this.on.play?.();
 				break;
 			case EventTypeE.SEEK:
@@ -348,6 +348,7 @@ export class WSCon {
 		this.on?.playbackInfo?.(d);
 		if (!d?.title) return;
 		this.createAudioElement();
+		this.audioEl?.load();
 	}
 
 	handleSeveredConnection() {
