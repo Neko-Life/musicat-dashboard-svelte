@@ -213,7 +213,6 @@ export class WSCon {
 		newAudio.addEventListener('canplaythrough', playHandler);
 		const stallHandler = () => {
 			this.on?.audioPaused?.(newAudio);
-			newAudio.pause();
 		};
 		newAudio.addEventListener('stalled', stallHandler);
 		const durationchangeHandler = async () => {
@@ -318,6 +317,7 @@ export class WSCon {
 				this.on.error?.(json.d);
 				break;
 			case EventTypeE.PAUSE:
+				this.audioEl?.pause();
 				this.on.pause?.();
 				break;
 			case EventTypeE.PLAYBACK_INFO:
@@ -333,6 +333,7 @@ export class WSCon {
 				this.on.seek?.(json.d);
 				break;
 			case EventTypeE.STOP:
+				handleEndAudioEl(this.audioEl);
 				this.on.stop?.();
 				break;
 			case EventTypeE.FX:
