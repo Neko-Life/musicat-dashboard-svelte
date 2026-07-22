@@ -322,6 +322,7 @@
 								name="volume"
 								min="0"
 								max="1000"
+								defaultvalue={1000}
 							/>
 						</div>
 					</div>
