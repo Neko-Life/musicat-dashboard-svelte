@@ -37,10 +37,24 @@
 	});
 
 	let nowPlaying: PlaybackInfo | undefined | null = $state();
+	let stopped = false;
 
 	function attachListeners(ws: WSCon) {
 		ws.on.playbackInfo = (d: PlaybackInfo) => {
 			nowPlaying = d;
+		};
+
+		ws.on.stop = () => {
+			stopped = true;
+		};
+
+		ws.on.play = () => {
+			stopped = false;
+		};
+
+		ws.on.audioStopped = () => {
+			if (!stopped) return;
+			nowPlaying = null;
 		};
 	}
 
@@ -112,7 +126,11 @@
 			<div class="controls">
 				<div class="progress-container">
 					<div class="progress-progress">
-						<div class="progress-seek"></div>
+						<div class="progress-seek">
+							<div class="seek-hover">
+								<div class="seek-btn" onclick={console.log}></div>
+							</div>
+						</div>
 					</div>
 					<div class="progress-left"></div>
 				</div>
@@ -247,6 +265,7 @@
 
 	.progress-container {
 		display: flex;
+		z-index: 1;
 	}
 
 	.controls-content,
@@ -268,23 +287,38 @@
 	}
 
 	.progress-seek {
+		position: absolute;
+		transform: translateX(50%) translateY(-50%);
+		pointer-events: none;
+	}
+
+	.seek-btn {
 		background-color: var(--default-color-hint);
 		border-radius: 100%;
 
-		position: absolute;
-		transform: translateX(50%) translateY(-50%);
-
 		max-width: 16px;
 		max-height: 16px;
-		width: 0vw;
-		height: 0vh;
+		width: 0px;
+		height: 0px;
 
-		transition-duration: 0.5s;
+		transition-duration: 0.3s;
 	}
 
-	.controls:hover .progress-seek {
-		width: 100vw;
-		/* height: 100vh; */
+	.seek-hover {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		width: 60px;
+		height: 60px;
+		pointer-events: all;
+	}
+
+	.controls:hover .seek-btn,
+	.seek-hover:hover .seek-btn {
+		width: 16px;
+		height: 16px;
+		pointer-events: all;
 	}
 
 	.progress-left {

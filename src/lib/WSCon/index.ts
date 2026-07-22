@@ -5,36 +5,66 @@ const DEBUG_LOG = false;
 export enum EventTypeE {
 	ERROR,
 	PAUSE,
-	PLAYBACK_INFO
+	PLAYBACK_INFO,
+	PLAY,
+	SEEK,
+	STOP,
+	FX,
+	QUEUE
 }
 
-export interface PlaybackInfo {
-	active_fx: number;
-	auto_play: boolean;
+export interface ErrorInfo {
+	error: true;
+	error_message: string | object; // !TODO: add interface
+}
+
+export interface FXInfo {
+	tempo: number;
+	pitch: number;
+	equalizer: string;
+	sampling_rate: number;
+	vibrato_f: number;
+	vibrato_d: number;
+	tremolo_f: number;
+	tremolo_d: number;
+	earwax: boolean;
+}
+
+export interface TrackInfo {
+	username: string;
 	avatar: string;
-	average_bitrate: number;
-	// color_hint will always exist when other property might be not
-	color_hint: number;
+	thumbnail: string;
 	desc: string;
+	title: string;
+	url: string;
+	// in ms
+	progress: number;
 	// in ms
 	duration: number;
+	average_bitrate: number;
+}
+
+export interface PlaybackInfo extends TrackInfo {
+	active_fx: number;
+	auto_play: boolean;
+	// color_hint will always exist when other property might be not
+	color_hint: number;
 	// need enum
 	loop_mode: number;
 	paused: boolean;
 	playing: boolean;
-	// in ms
-	progress: number;
 	repeat: number;
-	thumbnail: string;
-	title: string;
-	url: string;
-	username: string;
 }
 
 export interface EventData {
-	[EventTypeE.ERROR]: null;
-	[EventTypeE.PAUSE]: unknown;
+	[EventTypeE.ERROR]: ErrorInfo;
+	[EventTypeE.PAUSE]: null;
 	[EventTypeE.PLAYBACK_INFO]: PlaybackInfo;
+	[EventTypeE.PLAY]: null;
+	[EventTypeE.SEEK]: number;
+	[EventTypeE.STOP]: null;
+	[EventTypeE.FX]: FXInfo;
+	[EventTypeE.QUEUE]: TrackInfo[];
 }
 
 export type WSConJSONMessage<T = EventTypeE> = T extends EventTypeE
@@ -52,7 +82,23 @@ export interface WSConEventHandler {
 	audioStopped: (audioEl: HTMLAudioElement) => void;
 
 	// websocket events
+	error: (info: ErrorInfo) => void;
+	pause: () => void;
 	playbackInfo: (info: PlaybackInfo) => void;
+	play: () => void;
+	seek: (ms: number) => void;
+	stop: () => void;
+	fx: (info: FXInfo) => void;
+	queue: (queue: TrackInfo[]) => void;
+}
+
+async function installPromiseLogger(n: string, p: Promise<any>) {
+	if (DEBUG_LOG) {
+		return p
+			.then((...args: any) => console.debug(n, 'then:', ...args))
+			.catch((...args: any) => console.error(n, 'error:', ...args));
+	}
+	return p;
 }
 
 function handleEndAudioEl(audioEl?: HTMLAudioElement | null) {
@@ -108,7 +154,7 @@ export class WSCon {
 	on: Partial<WSConEventHandler>;
 
 	constructor(url: string, guildId: string) {
-		this.debugMode = false;
+		this.debugMode = DEBUG_LOG;
 		this.on = {};
 		this.waved = false;
 		this.guildId = guildId;
@@ -158,8 +204,8 @@ export class WSCon {
 			this.on?.audioStopped?.(newAudio);
 		};
 		newAudio.addEventListener('ended', endHandler);
-		const playHandler = () => {
-			newAudio.play();
+		const playHandler = async () => {
+			await installPromiseLogger('playHandler newAudio.play()', newAudio.play());
 
 			this.on?.audioLoaded?.(newAudio);
 			this.on?.audioPlaying?.(newAudio);
@@ -170,13 +216,16 @@ export class WSCon {
 			newAudio.pause();
 		};
 		newAudio.addEventListener('stalled', stallHandler);
-		const durationchangeHandler = () => {
-			// unpause if paused
+		const durationchangeHandler = async () => {
 			if (newAudio.paused && audioElIsBuffered(newAudio)) {
-				newAudio.play();
+				await installPromiseLogger(
+					'durationchangeHandler newAudio.play()',
+					newAudio.play()
+				);
 			}
 		};
 		newAudio.addEventListener('durationchange', durationchangeHandler);
+		newAudio.addEventListener('progress', durationchangeHandler);
 
 		document.body.appendChild(newAudio);
 		newAudio.load();
@@ -188,6 +237,10 @@ export class WSCon {
 				HTMLAudioElement['addEventListener']
 			>;
 
+		newAudio.addEventListener(...getLog('ended'));
+		newAudio.addEventListener(...getLog('canplaythrough'));
+		newAudio.addEventListener(...getLog('stalled'));
+		newAudio.addEventListener(...getLog('durationchange'));
 		newAudio.addEventListener(...getLog('progress'));
 		newAudio.addEventListener(...getLog('pause'));
 		newAudio.addEventListener(...getLog('ended'));
@@ -258,15 +311,33 @@ export class WSCon {
 	}
 
 	handleJsonMessage(json: WSConJSONMessage) {
+		if (DEBUG_LOG || this.debugMode) console.debug(json);
+
 		switch (json.e) {
 			case EventTypeE.ERROR:
-				json.d;
+				console.error('[ERROR]', json.d.error_message);
+				this.on.error?.(json.d);
 				break;
 			case EventTypeE.PAUSE:
-				json.d;
+				this.on.pause?.();
 				break;
 			case EventTypeE.PLAYBACK_INFO:
 				this.handlePlaybackInfo(json.d);
+				break;
+			case EventTypeE.PLAY:
+				this.on.play?.();
+				break;
+			case EventTypeE.SEEK:
+				this.on.seek?.(json.d);
+				break;
+			case EventTypeE.STOP:
+				this.on.stop?.();
+				break;
+			case EventTypeE.FX:
+				this.on.fx?.(json.d);
+				break;
+			case EventTypeE.QUEUE:
+				this.on.queue?.(json.d);
 				break;
 		}
 	}
