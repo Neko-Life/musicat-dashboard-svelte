@@ -148,9 +148,9 @@
 			<div class="error-container">Loading...</div>
 		{:else}
 			<div class="top-content">
-				<div class="input-container default-inp">
-					<input bind:value={search} />
-				</div>
+				<!-- <div class="input-container default-inp"> -->
+				<!-- 	<input bind:value={search} /> -->
+				<!-- </div> -->
 			</div>
 			<div
 				bind:clientWidth={guildListContainerWidth}

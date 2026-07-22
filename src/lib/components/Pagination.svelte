@@ -55,6 +55,7 @@
 		display: flex;
 		justify-content: center;
 		padding: 8px;
+		z-index: 5;
 	}
 
 	.pagination {

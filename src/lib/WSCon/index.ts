@@ -80,6 +80,7 @@ export interface WSConEventHandler {
 	audioLoading: (audioEl: HTMLAudioElement) => void;
 	audioLoaded: (audioEl: HTMLAudioElement) => void;
 	audioStopped: (audioEl: HTMLAudioElement) => void;
+	audioTimeUpdate: (audioEl: HTMLAudioElement) => void;
 
 	// websocket events
 	error: (info: ErrorInfo) => void;
@@ -223,8 +224,13 @@ export class WSCon {
 				);
 			}
 		};
-		newAudio.addEventListener('durationchange', durationchangeHandler);
-		newAudio.addEventListener('progress', durationchangeHandler);
+		// newAudio.addEventListener('durationchange', durationchangeHandler);
+		// newAudio.addEventListener('progress', durationchangeHandler);
+
+		const timeupdateHandler = () => {
+			this.on.audioTimeUpdate?.(newAudio);
+		};
+		newAudio.addEventListener('timeupdate', timeupdateHandler);
 
 		document.body.appendChild(newAudio);
 		this.audioEl = newAudio;
@@ -390,5 +396,12 @@ export class WSCon {
 		this.on?.audioStopped?.(this.audioEl!);
 		// !TODO: send ws stop event
 		handleEndAudioEl(this.audioEl!);
+	}
+
+	setVolume(volume: number) {
+		if (!this.audioEl) return;
+		if (volume < 0) volume = 0;
+		if (volume > 1) volume = 1;
+		this.audioEl.volume = volume;
 	}
 }
