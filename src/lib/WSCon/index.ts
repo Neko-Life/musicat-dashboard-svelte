@@ -170,11 +170,13 @@ export class WSCon {
 	audioEl: HTMLAudioElement | undefined;
 	reconnectInterval: number | null | undefined;
 	debugMode: boolean;
+	volume: number;
 
 	on: Partial<WSConEventHandler>;
 
 	constructor(url: string, guildId: string) {
 		this.debugMode = DEBUG_LOG;
+		this.volume = 1;
 		this.on = {};
 		this.waved = false;
 		this.guildId = guildId;
@@ -221,6 +223,7 @@ export class WSCon {
 		const newAudio = document.createElement('audio');
 		this.on?.audioLoading?.(newAudio);
 		newAudio.id = aid;
+		newAudio.volume = this.volume;
 		newAudio.src = this.getStreamUrl() + '?ts=' + ts;
 
 		const endHandler = () => {
@@ -437,7 +440,8 @@ export class WSCon {
 		if (volume < 0) volume = 0;
 		if (volume > 1) volume = 1;
 		this.audioEl.volume = volume;
-		return this.audioEl.volume;
+		this.volume = this.audioEl.volume;
+		return this.volume;
 	}
 
 	toggleMute() {
