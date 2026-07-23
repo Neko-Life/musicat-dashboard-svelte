@@ -29,7 +29,7 @@
 		<div class="pagination">
 			<div class="pagination-buttons-container">
 				<PaginationButton onPageClick={handlePrevPage} index={-1}
-					><ArrowLeftSolid fill="black" height={24} /></PaginationButton
+					><ArrowLeftSolid height={24} /></PaginationButton
 				>
 				{#each Array($pagination.maxPage) as _, i}
 					{#key i}
@@ -37,11 +37,7 @@
 					{/key}
 				{/each}
 				<PaginationButton onPageClick={handleNextPage} index={-1}
-					><ArrowLeftSolid
-						fill="black"
-						class="arr-rotate"
-						height={24}
-					/></PaginationButton
+					><ArrowLeftSolid class="arr-rotate" height={24} /></PaginationButton
 				>
 			</div>
 		</div>
@@ -56,6 +52,7 @@
 		justify-content: center;
 		padding: 8px;
 		z-index: 5;
+		--svg-fill: var(--default-bg-body);
 	}
 
 	.pagination {

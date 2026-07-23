@@ -11,7 +11,14 @@
 	const isElementOrChildOf = (parent: HTMLElement, child: HTMLElement | null): boolean => {
 		if (!parent || !child) return false;
 
-		return parent === child || isElementOrChildOf(parent, child.parentElement);
+		let c: HTMLElement | null = child;
+		do {
+			// skip child of svg
+			if (c instanceof SVGElement) return true;
+			if (parent === c) return true;
+			c = c.parentElement;
+		} while (c?.parentElement);
+		return false;
 	};
 
 	const handler = (e: MouseEvent) => {

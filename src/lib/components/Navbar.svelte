@@ -289,6 +289,11 @@
 		border-bottom: 1px solid var(--default-color-hint);
 	}
 
+	.mobile-menus,
+	#top-navbar {
+		--svg-fill: var(--default-text-color);
+	}
+
 	.mobile-menus-top {
 		padding: 16px 24px;
 
