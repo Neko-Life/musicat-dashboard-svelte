@@ -219,7 +219,6 @@
 
 	let showMobileVolumeInput: boolean = $state(true);
 	function toggleMobileVolumeInput(e: Event) {
-		console.log(e);
 		e.preventDefault();
 		e.stopPropagation();
 		showMobileVolumeInput = !showMobileVolumeInput;
