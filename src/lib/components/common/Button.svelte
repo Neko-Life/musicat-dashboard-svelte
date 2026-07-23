@@ -9,6 +9,7 @@
 <style>
 	.btn {
 		color: var(--default-bg-body);
+		padding: var(--btn-padding);
 	}
 
 	.btn-login {

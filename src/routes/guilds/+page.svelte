@@ -6,7 +6,7 @@
 	import { onMount } from 'svelte';
 
 	let search = $state('');
-	let perPage = $state(1);
+	let perPage = 1;
 
 	function setGuildPerPage(widthFor: number, heightFor: number): boolean {
 		if (widthFor === Infinity) widthFor = 2;

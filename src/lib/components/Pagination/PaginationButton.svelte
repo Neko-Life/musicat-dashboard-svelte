@@ -6,10 +6,13 @@
 	let {
 		index = 0,
 		inputPage = false,
-		onPageClick
+		onPageClick,
+		additionalClass = ''
 	}: {
+		// 0-based
 		index?: number;
 		inputPage?: boolean;
+		additionalClass?: string;
 
 		/**
 		 * Should return 0 if continue, 1 if return after call
@@ -21,7 +24,7 @@
 	const handlePaginationClick = (page: number) => {
 		if (!$pagination || onPageClick?.(page)) return;
 
-		if ($pagination.page !== page) {
+		if (!onlyInputPage && $pagination.page !== page) {
 			$pagination.page = page;
 			return;
 		}
@@ -50,12 +53,19 @@
 		inputPage = false;
 	};
 
-	let noInputPage = $derived(index === -1);
+	const noInputPage = $derived(index === -1);
+	const onlyInputPage = $derived(index === -2);
+	const onlyInputShouldRenderPage = $derived(
+		$pagination &&
+			onlyInputPage &&
+			$pagination.page > 2 &&
+			$pagination.page < $pagination.maxPage - 1
+	);
 </script>
 
 {#if $pagination !== undefined}
-	<div class="pagination-button">
-		{#if !noInputPage && $pagination.page === index + 1 && inputPage}
+	<div class="pagination-button {additionalClass}">
+		{#if !noInputPage && (onlyInputPage || $pagination.page === index + 1) && inputPage}
 			<div class="btn input-container default-inp">
 				<input
 					class="input-page"
@@ -69,10 +79,18 @@
 		{/if}
 
 		<Button
-			class="pagination{$pagination.page === index + 1 ? ' active' : ''}"
+			class="pagination{onlyInputShouldRenderPage || $pagination.page === index + 1
+				? ' active'
+				: ''}"
 			on:click={() => handlePaginationClick(index + 1)}
 		>
-			{#if !noInputPage}
+			{#if onlyInputPage}
+				{#if onlyInputShouldRenderPage}
+					{$pagination.page}
+				{:else}
+					. .
+				{/if}
+			{:else if !noInputPage}
 				{index + 1}
 			{/if}
 
@@ -85,6 +103,7 @@
 	.pagination-button {
 		grid-row: 1;
 		position: relative;
+		--btn-padding: 8px;
 	}
 
 	.input-page {

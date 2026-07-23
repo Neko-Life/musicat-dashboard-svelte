@@ -1,6 +1,6 @@
 export interface IGetLoginParams {
 	headerRedirect?: string;
-        isInvite?: boolean;
+	isInvite?: boolean;
 }
 
 export interface IPostLoginData {
@@ -30,6 +30,8 @@ export interface IPostLoginResponse {
 }
 
 export interface IPagination {
+	// 1-based
 	page: number;
+	// 1-based
 	maxPage: number;
 }

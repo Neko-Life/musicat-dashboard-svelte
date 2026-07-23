@@ -28,17 +28,33 @@
 	<div class="pagination-container">
 		<div class="pagination">
 			<div class="pagination-buttons-container">
-				<PaginationButton onPageClick={handlePrevPage} index={-1}
-					><ArrowLeftSolid height={24} /></PaginationButton
-				>
-				{#each Array($pagination.maxPage) as _, i}
+				<PaginationButton onPageClick={handlePrevPage} index={-1}>
+					<div class="icon-container{$pagination.page <= 1 ? ' disabled' : ''}">
+						<ArrowLeftSolid height={24} />
+					</div>
+				</PaginationButton>
+				{#each Array($pagination.maxPage > 5 ? 5 : $pagination.maxPage) as _, i}
 					{#key i}
-						<PaginationButton index={i} />
+						{#if $pagination.maxPage > 5 && i === 2}
+							<PaginationButton index={-2} />
+						{:else}
+							<PaginationButton
+								index={$pagination.maxPage > 5 && i > 2
+									? $pagination.maxPage + i - 5
+									: i}
+							/>
+						{/if}
 					{/key}
 				{/each}
-				<PaginationButton onPageClick={handleNextPage} index={-1}
-					><ArrowLeftSolid class="arr-rotate" height={24} /></PaginationButton
-				>
+				<PaginationButton onPageClick={handleNextPage} index={-1}>
+					<div
+						class="icon-container{$pagination.page >= $pagination.maxPage
+							? ' disabled'
+							: ''}"
+					>
+						<ArrowLeftSolid class="arr-rotate" height={24} />
+					</div>
+				</PaginationButton>
 			</div>
 		</div>
 	</div>
@@ -55,8 +71,16 @@
 		--svg-fill: var(--default-bg-body);
 	}
 
+	.icon-container {
+		display: flex;
+	}
+
+	.disabled {
+		--svg-fill: gray;
+	}
+
 	.pagination {
-		max-height: 24px;
+		background-color: var(--default-btn-bg-color-hover);
 		display: flex;
 	}
 
