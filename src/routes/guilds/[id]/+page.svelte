@@ -150,8 +150,10 @@
 			return;
 		}
 		const uBase = base || 0;
+		const rem = uBase + rel;
+		if (rem > total) return;
 
-		progressEl.style.width = `${((uBase + rel) / total) * 100}%`;
+		progressEl.style.width = `${(rem / total) * 100}%`;
 	}
 
 	function updateProgressNb({
@@ -171,6 +173,7 @@
 
 		const uBase = base || 0;
 		const curMs = uBase + rel;
+		if (curMs > total) return;
 
 		const s = msToDisplay(curMs);
 		if (s === progressNbEl.textContent.split('/')[0]) return;
@@ -195,6 +198,7 @@
 		const uBase = base || 0;
 		const curMs = uBase + rel;
 		const totalRemain = total - curMs;
+		if (totalRemain < 0) return;
 
 		const s = '-' + msToDisplay(totalRemain);
 		if (s === progressNbLeftEl.textContent) return;
