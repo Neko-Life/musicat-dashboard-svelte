@@ -427,8 +427,17 @@
 	}
 
 	.thumbnail-container {
+		min-width: 200px;
 		max-width: 100%;
 		height: 100%;
+	}
+
+	.desc-title {
+		font-size: 20px;
+	}
+
+	.desc-user {
+		font-size: 16px;
 	}
 
 	.thumbnail-container img {
@@ -708,6 +717,16 @@
 
 		.content {
 			flex-direction: column;
+		}
+	}
+
+	@media screen and (min-height: 900px) {
+		.desc-title {
+			font-size: 32px;
+		}
+
+		.desc-user {
+			font-size: 24px;
 		}
 	}
 </style>

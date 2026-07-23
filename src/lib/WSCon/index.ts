@@ -239,14 +239,15 @@ export class WSCon {
 			this.on?.audioPaused?.(newAudio);
 		};
 		newAudio.addEventListener('stalled', stallHandler);
-		const durationchangeHandler = async () => {
-			if (newAudio.paused && audioElIsBuffered(newAudio)) {
-				await installPromiseLogger(
-					'durationchangeHandler newAudio.play()',
-					newAudio.play()
-				);
-			}
-		};
+
+		// const durationchangeHandler = async () => {
+		// 	if (newAudio.paused && audioElIsBuffered(newAudio)) {
+		// 		await installPromiseLogger(
+		// 			'durationchangeHandler newAudio.play()',
+		// 			newAudio.play()
+		// 		);
+		// 	}
+		// };
 		// newAudio.addEventListener('durationchange', durationchangeHandler);
 		// newAudio.addEventListener('progress', durationchangeHandler);
 

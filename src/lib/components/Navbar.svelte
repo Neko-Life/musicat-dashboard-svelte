@@ -301,6 +301,10 @@
 		justify-content: space-between;
 	}
 
+	.mobile-menus-top .btn-logout-container {
+		width: fit-content;
+	}
+
 	.mobile-menu-list-container {
 		display: flex;
 		flex-direction: column;
