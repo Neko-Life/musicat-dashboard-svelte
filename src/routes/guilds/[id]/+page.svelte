@@ -633,7 +633,7 @@
 
 	.play-seek-container > .play-stop {
 		height: 75%;
-		min-height: 50px;
+		min-height: 48px;
 	}
 
 	label[for='volume'] {
