@@ -55,6 +55,13 @@ button {
 	color: var(--default-button-text-color);
 }
 
+.btn-nostyle {
+	background-color: unset;
+	padding: 0;
+	margin: 0;
+	border: 0;
+}
+
 .btn {
 	background-color: var(--default-btn-bg-color);
 	transition-duration: 0.2s;

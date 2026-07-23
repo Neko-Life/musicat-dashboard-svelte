@@ -403,5 +403,12 @@ export class WSCon {
 		if (volume < 0) volume = 0;
 		if (volume > 1) volume = 1;
 		this.audioEl.volume = volume;
+		return this.audioEl.volume;
+	}
+
+	toggleMute() {
+		if (!this.audioEl) return;
+		this.audioEl.muted = !this.audioEl.muted;
+		return this.audioEl.muted;
 	}
 }
