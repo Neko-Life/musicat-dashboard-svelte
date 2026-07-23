@@ -391,6 +391,7 @@
 	#guild-player-root {
 		display: flex;
 		flex-direction: column;
+		overflow: hidden;
 	}
 
 	.guild-player-root-container {
