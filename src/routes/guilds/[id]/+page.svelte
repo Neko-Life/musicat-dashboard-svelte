@@ -217,7 +217,7 @@
 		muted = !!ws?.toggleMute();
 	}
 
-	let showMobileVolumeInput: boolean = $state(true);
+	let showMobileVolumeInput: boolean = $state(false);
 	function toggleMobileVolumeInput(e: Event) {
 		e.preventDefault();
 		e.stopPropagation();
