@@ -1,6 +1,20 @@
 import { getAPIUrl } from '$lib/utils/services';
+import { user } from '$lib/store';
+import { isOnBrowser } from '$lib/utils/common';
+import type { IUser } from '$lib/interfaces/services/auth';
 
 const DEBUG_LOG = false;
+let localUser: IUser | null = null;
+if (isOnBrowser()) {
+	user.subscribe(
+		(u) => {
+			localUser = u || null;
+		},
+		() => {
+			localUser = null;
+		}
+	);
+}
 
 export enum EventTypeE {
 	ERROR,
@@ -10,7 +24,8 @@ export enum EventTypeE {
 	SEEK,
 	STOP,
 	FX,
-	QUEUE
+	QUEUE,
+	REGISTER
 }
 
 export interface ErrorInfo {
@@ -277,6 +292,16 @@ export class WSCon {
 			this.clearReconnectInterval();
 
 			console.log('WSCon: Open!');
+			if (!localUser) throw new Error('You need to login to listen to voice session!');
+
+			this.con.send(
+				JSON.stringify({
+					e: EventTypeE.REGISTER,
+					d: {
+						uid: localUser?.id
+					}
+				})
+			);
 		});
 
 		this.con.addEventListener('message', (event) => {
