@@ -80,6 +80,9 @@ export interface EventData {
 	[EventTypeE.STOP]: null;
 	[EventTypeE.FX]: FXInfo;
 	[EventTypeE.QUEUE]: TrackInfo[];
+
+	////////////////////////////////////////////////////////////////////////////////
+	[EventTypeE.REGISTER]: null;
 }
 
 export type WSConJSONMessage<T = EventTypeE> = T extends EventTypeE
@@ -96,6 +99,7 @@ export interface WSConEventHandler {
 	audioLoaded: (audioEl: HTMLAudioElement) => void;
 	audioStopped: (audioEl: HTMLAudioElement) => void;
 	audioTimeUpdate: (audioEl: HTMLAudioElement) => void;
+	audioEmptied: (audioEl: HTMLAudioElement) => void;
 
 	// websocket events
 	error: (info: ErrorInfo) => void;
@@ -207,13 +211,17 @@ export class WSCon {
 		}
 	}
 
+	getStreamUrl() {
+		return getAPIUrl('/stream/' + this.guildId);
+	}
+
 	createAudioElement() {
 		const ts = new Date().valueOf();
 		const aid = '#playback-' + this.guildId + '-' + ts;
 		const newAudio = document.createElement('audio');
 		this.on?.audioLoading?.(newAudio);
 		newAudio.id = aid;
-		newAudio.src = getAPIUrl('/stream/' + this.guildId + '?ts=' + ts);
+		newAudio.src = this.getStreamUrl() + '?ts=' + ts;
 
 		const endHandler = () => {
 			handleEndAudioEl(newAudio);
@@ -246,6 +254,10 @@ export class WSCon {
 			this.on.audioTimeUpdate?.(newAudio);
 		};
 		newAudio.addEventListener('timeupdate', timeupdateHandler);
+		const emptiedHandler = () => {
+			this.on.audioEmptied?.(newAudio);
+		};
+		newAudio.addEventListener('emptied', emptiedHandler);
 
 		document.body.appendChild(newAudio);
 		this.audioEl = newAudio;
@@ -405,20 +417,16 @@ export class WSCon {
 	play() {
 		if (this.hasAudioElement()) return;
 		// !TODO: send ws play event
-		this.resetAudioElement();
-		this.createAudioElement();
 	}
 
 	pause() {
 		if (!this.hasAudioElement()) return;
-		this.on?.audioPaused?.(this.audioEl!);
 		// !TODO: send ws pause event
 		handleEndAudioEl(this.audioEl!);
 	}
 
 	stop() {
 		if (!this.hasAudioElement()) return;
-		this.on?.audioStopped?.(this.audioEl!);
 		// !TODO: send ws stop event
 		handleEndAudioEl(this.audioEl!);
 	}
