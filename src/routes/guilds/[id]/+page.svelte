@@ -5,6 +5,17 @@
 	import useGetMusicatUser from '$lib/queries/useGetMusicatUser';
 	import OuterClick from '$lib/components/Hooks/OuterClick.svelte';
 
+	const IDs = {
+		btnPrev: 'btn-prev',
+		btnNext: 'btn-next',
+		btnStop: 'btn-stop',
+		btnPP: 'btn-play-pause',
+		btnSeek: 'btn-seek',
+		progressContainer: 'progress-container',
+		progressHover: 'progress-hover',
+		hoverTs: 'progress-hover-ts'
+	};
+
 	const musicatUser = useGetMusicatUser();
 
 	let { params } = $props();
@@ -40,10 +51,26 @@
 	let delayNowPlaying: PlaybackInfo | undefined | null = $state();
 	let nowPlaying: PlaybackInfo | undefined | null = $state();
 	let timeRelative: number = $state(0);
+	let seekingDisabled = $state(false);
+	let isSeeking = $state(false);
 
 	const playbackInfoHasTrack = (info?: PlaybackInfo | null): info is PlaybackInfo => {
 		return !!info?.title;
 	};
+
+	function getEl(id: string): HTMLElement | null | undefined {
+		return gprEl?.querySelector('#' + id);
+	}
+
+	function enableBtn(id: string) {
+		const btn = getEl(id);
+		if (btn instanceof HTMLButtonElement) btn.disabled = false;
+	}
+
+	function disableBtn(id: string) {
+		const btn = getEl(id);
+		if (btn instanceof HTMLButtonElement) btn.disabled = true;
+	}
 
 	function attachListeners(ws: WSCon) {
 		ws.on.playbackInfo = (d: PlaybackInfo) => {
@@ -55,16 +82,30 @@
 					total: nowPlaying?.duration
 				});
 			} else delayNowPlaying = d;
+
+			enableBtn(IDs.btnPrev);
+			enableBtn(IDs.btnNext);
+		};
+
+		ws.on.play = () => {
+			enableBtn(IDs.btnPP);
+		};
+
+		ws.on.pause = () => {
+			enableBtn(IDs.btnPP);
 		};
 
 		ws.on.stop = () => {
 			delayNowPlaying = null;
 			nowPlaying = null;
+			enableBtn(IDs.btnStop);
 		};
 
 		ws.on.seek = (ms: number) => {
 			if (!playbackInfoHasTrack(nowPlaying)) return;
 			nowPlaying.progress = ms - timeRelative;
+			enableBtn(IDs.btnSeek);
+			seekingDisabled = false;
 		};
 
 		ws.on.audioEmptied = (el) => {
@@ -144,16 +185,18 @@
 	function updateProgress({ base, rel, total }: { base?: number; rel: number; total?: number }) {
 		updateProgressNb({ base, rel, total });
 		updateProgressNbLeft({ base, rel, total });
-		if (!progressEl) return;
+		if (!progressEl || isSeeking || seekingDisabled) return;
 		if (!total) {
 			progressEl.style.width = '0%';
 			return;
 		}
 		const uBase = base || 0;
-		const rem = uBase + rel;
-		if (rem > total) return;
+		let rem = uBase + rel;
+		if (rem > total) rem = total;
 
-		progressEl.style.width = `${(rem / total) * 100}%`;
+		const w = `${(rem / total) * 100}%`;
+		if (w === progressEl.style.width) return;
+		progressEl.style.width = w;
 	}
 
 	function updateProgressNb({
@@ -172,8 +215,8 @@
 		}
 
 		const uBase = base || 0;
-		const curMs = uBase + rel;
-		if (curMs > total) return;
+		let curMs = uBase + rel;
+		if (curMs > total) curMs = total;
 
 		const s = msToDisplay(curMs);
 		if (s === progressNbEl.textContent.split('/')[0]) return;
@@ -197,8 +240,8 @@
 
 		const uBase = base || 0;
 		const curMs = uBase + rel;
-		const totalRemain = total - curMs;
-		if (totalRemain < 0) return;
+		let totalRemain = total - curMs;
+		if (totalRemain < 0) totalRemain = 0;
 
 		const s = '-' + msToDisplay(totalRemain);
 		if (s === progressNbLeftEl.textContent) return;
@@ -222,6 +265,110 @@
 		e.preventDefault();
 		e.stopPropagation();
 		showMobileVolumeInput = !showMobileVolumeInput;
+	}
+
+	function handlePrev(e: MouseEvent) {
+		disableBtn(IDs.btnPrev);
+	}
+
+	function handlePlayPause(e: MouseEvent) {
+		disableBtn(IDs.btnPP);
+	}
+
+	function handleStop(e: MouseEvent) {
+		disableBtn(IDs.btnStop);
+	}
+
+	function handleNext(e: MouseEvent) {
+		disableBtn(IDs.btnNext);
+	}
+
+	function sendSeek(ms: number) {
+		console.log({ ms });
+		//ws.seek(ms);
+	}
+
+	function handleSeek(percent: number) {
+		const totalMs = nowPlaying?.duration;
+		if (typeof totalMs !== 'number') return;
+		sendSeek((totalMs / 100) * percent);
+
+		disableBtn(IDs.btnSeek);
+		seekingDisabled = true;
+	}
+
+	function handleMouseMoveSeek(e: MouseEvent) {
+		if (!progressEl || !isSeeking) return;
+		const progressContainerEl = getEl(IDs.progressContainer);
+		if (!progressContainerEl) return;
+
+		handleProgressHover(e);
+
+		const w = `${(e.clientX / progressContainerEl.clientWidth) * 100}%`;
+		if (w === progressEl.style.width) return;
+		progressEl.style.width = w;
+	}
+
+	function cancelSeekHandler(e: KeyboardEvent) {
+		if (e.key !== 'Escape') return;
+		doneSeeking();
+	}
+
+	function doneSeeking() {
+		document.body.removeEventListener('mousemove', handleMouseMoveSeek);
+		document.body.removeEventListener('mouseup', handleBtnSeekClickRelease);
+		document.body.removeEventListener('keydown', cancelSeekHandler);
+		isSeeking = false;
+	}
+
+	function handleBtnSeekClickRelease(e: MouseEvent) {
+		doneSeeking();
+		handleProgressClick(e);
+	}
+
+	function handleBtnSeekClick(e: MouseEvent) {
+		isSeeking = true;
+		document.body.addEventListener('mousemove', handleMouseMoveSeek);
+		document.body.addEventListener('mouseup', handleBtnSeekClickRelease);
+		document.body.addEventListener('keydown', cancelSeekHandler);
+	}
+
+	function handleProgressClick(e: MouseEvent) {
+		const progressEl = getEl(IDs.progressContainer);
+		if (!progressEl) return;
+
+		handleSeek((e.clientX / progressEl.clientWidth) * 100);
+	}
+
+	function handleProgressHover(e: MouseEvent) {
+		if (seekingDisabled) return;
+		const totalMs = nowPlaying?.duration;
+		if (typeof totalMs !== 'number') return;
+		const tooltipEl = getEl(IDs.progressHover);
+		if (!tooltipEl) return;
+		const progressEl = getEl(IDs.progressContainer);
+		if (!progressEl) return;
+		const tsEl = getEl(IDs.hoverTs);
+		if (!tsEl) return;
+
+		let leftPx = e.clientX;
+		const minLeft = tooltipEl.offsetWidth / 2;
+		const maxLeft = progressEl.clientWidth - minLeft;
+		let pointLeft = 0;
+		if (leftPx < minLeft) {
+			pointLeft -= minLeft - leftPx;
+			leftPx = minLeft;
+		}
+		if (leftPx > maxLeft) {
+			pointLeft += leftPx - maxLeft;
+			leftPx = maxLeft;
+		}
+		tooltipEl.style.left = `${leftPx}px`;
+		tsEl.textContent = msToDisplay(totalMs * (e.clientX / progressEl.clientWidth));
+
+		const pointEl: HTMLDivElement | null = tooltipEl.querySelector('.point');
+		if (!pointEl) return;
+		pointEl.style.left = `calc(50% + ${pointLeft}px)`;
 	}
 </script>
 
@@ -283,20 +430,45 @@
 		</div>
 
 		<div class="controls-container">
-			<div class="controls">
+			<div
+				class="controls{isSeeking || seekingDisabled ? ' seeking' : ''}{seekingDisabled
+					? ' waiting-seek'
+					: ''}"
+			>
 				<div class="progress-container-container">
-					<div class="progress-container">
+					<!-- svelte-ignore a11y_click_events_have_key_events -->
+					<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+					<div
+						id={IDs.progressContainer}
+						class="progress-container{seekingDisabled ? ' disabled' : ''}"
+						role="progressbar"
+						onclick={seekingDisabled ? undefined : handleProgressClick}
+						onmousemove={handleProgressHover}
+					>
 						<div bind:this={progressEl} class="progress-progress">
 							<div class="progress-seek">
 								<div class="seek-hover">
 									<button
+										id={IDs.btnSeek}
 										aria-label="Seek Button"
 										class="btn-nostyle seek-btn"
-										onclick={console.log}
+										onmousedown={handleBtnSeekClick}
 									></button>
 								</div>
 							</div>
 						</div>
+
+						{#if typeof nowPlaying?.duration === 'number'}
+							<div
+								id={IDs.progressHover}
+								class="progress-tooltip-container-container"
+							>
+								<div class="progress-tooltip-container">
+									<div id={IDs.hoverTs}>--:--</div>
+									<div class="point"></div>
+								</div>
+							</div>
+						{/if}
 					</div>
 				</div>
 				<div class="controls-content">
@@ -305,7 +477,7 @@
 						<!-- <div>EQUALIZER</div> -->
 					</div>
 					<div class="play-seek-container">
-						<div class="seek prev">
+						<button id={IDs.btnPrev} class="btn-nostyle seek prev" onclick={handlePrev}>
 							<div class="icon">
 								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"
 									><!--!Font Awesome Free v7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path
@@ -313,8 +485,12 @@
 									/></svg
 								>
 							</div>
-						</div>
-						<div class="play-stop play">
+						</button>
+						<button
+							id={IDs.btnPP}
+							class="btn-nostyle play-stop play"
+							onclick={handlePlayPause}
+						>
 							<div class="icon">
 								{#if playbackInfoHasTrack(nowPlaying) && !nowPlaying.paused}
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"
@@ -330,8 +506,12 @@
 									>
 								{/if}
 							</div>
-						</div>
-						<div class="play-stop stop">
+						</button>
+						<button
+							id={IDs.btnStop}
+							class="btn-nostyle play-stop stop"
+							onclick={handleStop}
+						>
 							<div class="icon">
 								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"
 									><!--!Font Awesome Free v7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path
@@ -339,8 +519,8 @@
 									/></svg
 								>
 							</div>
-						</div>
-						<div class="seek next">
+						</button>
+						<button id={IDs.btnNext} class="btn-nostyle seek next" onclick={handleNext}>
 							<div class="icon">
 								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"
 									><!--!Font Awesome Free v7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path
@@ -348,7 +528,7 @@
 									/></svg
 								>
 							</div>
-						</div>
+						</button>
 					</div>
 					<div class="side-container right-container">
 						<div bind:this={progressNbLeftEl} class="progress-nb progress-nb-left">
@@ -392,6 +572,11 @@
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
+	}
+
+	#guild-player-root button:disabled {
+		opacity: 0.7;
+		cursor: not-allowed;
 	}
 
 	.guild-player-root-container {
@@ -489,6 +674,50 @@
 		position: absolute;
 		width: 100%;
 		left: 0;
+
+		height: fit-content;
+		cursor: pointer;
+	}
+
+	.progress-container.disabled {
+		cursor: not-allowed;
+	}
+
+	.progress-tooltip-container-container {
+		display: none;
+		position: absolute;
+
+		top: -100%;
+		transform: translateY(-100%) translateX(-50%);
+	}
+
+	.progress-tooltip-container {
+		position: relative;
+
+		padding: 2px 4px;
+		border-radius: 4px;
+
+		box-shadow: 0 0 20px 0 var(--default-bg-body);
+		background-color: var(--default-color-hint);
+		transition-duration: inherit, 10s;
+		transition-property: all, background-color;
+	}
+
+	.progress-tooltip-container .point {
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
+		bottom: -6px;
+		z-index: 0;
+
+		border-left: 10px solid transparent;
+		border-right: 10px solid transparent;
+		border-top: 8px solid var(--default-color-hint);
+	}
+
+	.progress-container:hover .progress-tooltip-container-container,
+	.controls.seeking .progress-tooltip-container-container {
+		display: flex;
 	}
 
 	.progress-progress {
@@ -505,8 +734,9 @@
 		position: relative;
 	}
 
-	.controls:hover .progress-progress {
-		height: 4px;
+	.controls:hover .progress-progress,
+	.controls.seeking .progress-progress {
+		height: 8px;
 	}
 
 	.progress-seek {
@@ -519,8 +749,6 @@
 		background-color: var(--default-color-hint);
 		border-radius: 100%;
 
-		max-width: 16px;
-		max-height: 16px;
 		width: 0px;
 		height: 0px;
 	}
@@ -536,9 +764,10 @@
 	}
 
 	.controls:hover .seek-btn,
+	.controls.seeking .seek-btn,
 	.seek-hover:hover .seek-btn {
-		width: 16px;
-		height: 16px;
+		width: 20px;
+		height: 20px;
 		pointer-events: all;
 	}
 
@@ -610,15 +839,38 @@
 		--svg-fill: var(--default-bg-body);
 	}
 
-	.play-seek-container > div {
-		aspect-ratio: 1 / 1;
-
+	.play-seek-container > button {
 		display: flex;
 		justify-content: center;
 		align-items: center;
 
-		border-radius: 100%;
 		background-color: white;
+	}
+
+	.play-seek-container > button,
+	.volume-label {
+		transition-duration: 0.3s;
+		aspect-ratio: 1 / 1;
+		border-radius: 100%;
+	}
+
+	.play-seek-container > button:not(:disabled),
+	.volume-label:not(:disabled),
+	.seek-btn:not(:disabled) {
+		cursor: pointer;
+	}
+
+	.play-seek-container > button:hover:not(:disabled),
+	.volume-label:hover:not(:disabled),
+	.seek-btn:hover:not(:disabled) {
+		box-shadow: 0 0 50px 2px var(--default-color-hint);
+		z-index: 1;
+	}
+
+	.play-seek-container > button:active:not(:disabled),
+	.volume-label:active:not(:disabled),
+	.seek-btn:active:not(:disabled) {
+		background-color: var(--default-color-hint);
 	}
 
 	.play-seek-container .icon {
