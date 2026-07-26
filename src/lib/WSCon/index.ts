@@ -372,8 +372,6 @@ export class WSCon {
 				break;
 			case EventTypeE.PLAY:
 				if (this.audioEl?.paused) this.audioEl.play();
-				if ((this.audioEl?.readyState || 0) < HTMLMediaElement.HAVE_ENOUGH_DATA)
-					this.audioEl?.load();
 				this.on.play?.();
 				break;
 			case EventTypeE.SEEK:
@@ -397,8 +395,12 @@ export class WSCon {
 		setColorHint(d);
 		this.on?.playbackInfo?.(d);
 		if (!d?.title) return;
-		this.createAudioElement();
-		this.audioEl?.load();
+
+		// timeout to make sure audio element is loading correctly
+		setTimeout(() => {
+			this.createAudioElement();
+			this.audioEl?.load();
+		}, 100);
 	}
 
 	handleSeveredConnection() {
