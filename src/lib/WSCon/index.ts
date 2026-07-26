@@ -25,7 +25,9 @@ export enum EventTypeE {
 	STOP,
 	FX,
 	QUEUE,
-	REGISTER
+	REGISTER,
+	NEXT,
+	PREV
 }
 
 export interface ErrorInfo {
@@ -80,15 +82,31 @@ export interface EventData {
 	[EventTypeE.STOP]: null;
 	[EventTypeE.FX]: FXInfo;
 	[EventTypeE.QUEUE]: TrackInfo[];
-
-	////////////////////////////////////////////////////////////////////////////////
-	[EventTypeE.REGISTER]: null;
 }
 
-export type WSConJSONMessage<T = EventTypeE> = T extends EventTypeE
+export interface EventPayload {
+	[EventTypeE.PAUSE]: null;
+	[EventTypeE.PLAY]: null;
+	[EventTypeE.SEEK]: number;
+	[EventTypeE.STOP]: null;
+	[EventTypeE.NEXT]: null;
+	[EventTypeE.PREV]: null;
+	[EventTypeE.REGISTER]: {
+		uid: string | undefined;
+	};
+}
+
+export type WSConJSONMessage<T = keyof EventData> = T extends keyof EventData
 	? {
 			e: T;
 			d: EventData[T];
+		}
+	: unknown;
+
+export type WSConJSONPayload<T = keyof EventPayload> = T extends keyof EventPayload
+	? {
+			e: T;
+			d: EventPayload[T];
 		}
 	: unknown;
 
@@ -303,6 +321,10 @@ export class WSCon {
 		newAudio.addEventListener(...getLog('waitingforkey'));
 	}
 
+	send(o: WSConJSONPayload) {
+		this.con.send(JSON.stringify(o));
+	}
+
 	setupHandlers() {
 		this.con.addEventListener('open', (event) => {
 			this.clearReconnectInterval();
@@ -310,14 +332,12 @@ export class WSCon {
 			console.log('WSCon: Open!');
 			if (!localUser) throw new Error('You need to login to listen to voice session!');
 
-			this.con.send(
-				JSON.stringify({
-					e: EventTypeE.REGISTER,
-					d: {
-						uid: localUser?.id
-					}
-				})
-			);
+			this.send({
+				e: EventTypeE.REGISTER,
+				d: {
+					uid: localUser?.id
+				}
+			});
 		});
 
 		this.con.addEventListener('message', (event) => {
@@ -420,23 +440,6 @@ export class WSCon {
 		return elIsValidNode(this.audioEl);
 	}
 
-	play() {
-		if (this.hasAudioElement()) return;
-		// !TODO: send ws play event
-	}
-
-	pause() {
-		if (!this.hasAudioElement()) return;
-		// !TODO: send ws pause event
-		handleEndAudioEl(this.audioEl!);
-	}
-
-	stop() {
-		if (!this.hasAudioElement()) return;
-		// !TODO: send ws stop event
-		handleEndAudioEl(this.audioEl!);
-	}
-
 	setVolume(volume: number) {
 		if (!this.audioEl) return;
 		if (volume < 0) volume = 0;
@@ -450,5 +453,49 @@ export class WSCon {
 		if (!this.audioEl) return;
 		this.audioEl.muted = !this.audioEl.muted;
 		return this.audioEl.muted;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////
+
+	play() {
+		this.send({
+			e: EventTypeE.PLAY,
+			d: null
+		});
+	}
+
+	pause() {
+		this.send({
+			e: EventTypeE.PAUSE,
+			d: null
+		});
+	}
+
+	stop() {
+		this.send({
+			e: EventTypeE.STOP,
+			d: null
+		});
+	}
+
+	seek(ms: number) {
+		this.send({
+			e: EventTypeE.SEEK,
+			d: Math.floor(ms)
+		});
+	}
+
+	prev() {
+		this.send({
+			e: EventTypeE.PREV,
+			d: null
+		});
+	}
+
+	next() {
+		this.send({
+			e: EventTypeE.NEXT,
+			d: null
+		});
 	}
 }

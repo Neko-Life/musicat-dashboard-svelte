@@ -88,10 +88,12 @@
 		};
 
 		ws.on.play = () => {
+			if (nowPlaying) nowPlaying.paused = false;
 			enableBtn(IDs.btnPP);
 		};
 
 		ws.on.pause = () => {
+			if (nowPlaying) nowPlaying.paused = true;
 			enableBtn(IDs.btnPP);
 		};
 
@@ -268,30 +270,39 @@
 	}
 
 	function handlePrev(e: MouseEvent) {
+		if (!ws) return;
+		ws.prev();
 		disableBtn(IDs.btnPrev);
 	}
 
 	function handlePlayPause(e: MouseEvent) {
+		if (!ws) return;
+		if (!ws.audioEl) return ws.play();
+
+		const paused = ws.audioEl.paused;
+		paused ? ws.play() : ws.pause();
+
 		disableBtn(IDs.btnPP);
 	}
 
 	function handleStop(e: MouseEvent) {
+		if (!ws) return;
+		ws.stop();
 		disableBtn(IDs.btnStop);
 	}
 
 	function handleNext(e: MouseEvent) {
+		if (!ws) return;
+		ws.next();
 		disableBtn(IDs.btnNext);
 	}
 
-	function sendSeek(ms: number) {
-		console.log({ ms });
-		//ws.seek(ms);
-	}
-
 	function handleSeek(percent: number) {
+		if (!ws) return;
 		const totalMs = nowPlaying?.duration;
 		if (typeof totalMs !== 'number') return;
-		sendSeek((totalMs / 100) * percent);
+		const ms = (totalMs / 100) * percent;
+		ws.seek(ms);
 
 		disableBtn(IDs.btnSeek);
 		seekingDisabled = true;
@@ -697,7 +708,7 @@
 		padding: 2px 4px;
 		border-radius: 4px;
 
-		box-shadow: 0 0 20px 0 var(--default-bg-body);
+		box-shadow: 0 0 4px 0 var(--default-bg-body);
 		background-color: var(--default-color-hint);
 		transition-duration: inherit, 10s;
 		transition-property: all, background-color;
