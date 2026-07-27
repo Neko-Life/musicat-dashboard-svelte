@@ -90,6 +90,7 @@
 		ws.on.play = () => {
 			if (nowPlaying) nowPlaying.paused = false;
 			enableBtn(IDs.btnPP);
+			enableBtn(IDs.btnPrev);
 		};
 
 		ws.on.pause = () => {
@@ -104,11 +105,17 @@
 		};
 
 		ws.on.seek = (ms: number) => {
-                        // accounting audio element buffering
+			disableBtn(IDs.btnSeek);
+			seekingDisabled = true;
+			const tsEl = getEl(IDs.hoverTs);
+			if (tsEl) tsEl.textContent = msToDisplay(ms);
+
+			// accounting audio element buffering
 			setTimeout(() => {
 				if (!playbackInfoHasTrack(nowPlaying)) return;
 				nowPlaying.progress = ms - timeRelative;
 				enableBtn(IDs.btnSeek);
+				enableBtn(IDs.btnPrev);
 				seekingDisabled = false;
 			}, 6000);
 		};
@@ -703,6 +710,7 @@
 
 		top: -100%;
 		transform: translateY(-100%) translateX(-50%);
+		left: 50%;
 	}
 
 	.progress-tooltip-container {
