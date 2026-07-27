@@ -1,5 +1,7 @@
 # Musicat Dashboard
 
+Just a web player control for Musicat's voice channel session.
+
 This Dashboard was made without much ideas in my mind, if anyone have any ideas feel free to create an issue or even PR.
 
 ![image](ss.png)
