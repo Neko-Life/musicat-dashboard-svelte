@@ -104,10 +104,13 @@
 		};
 
 		ws.on.seek = (ms: number) => {
-			if (!playbackInfoHasTrack(nowPlaying)) return;
-			nowPlaying.progress = ms - timeRelative;
-			enableBtn(IDs.btnSeek);
-			seekingDisabled = false;
+                        // accounting audio element buffering
+			setTimeout(() => {
+				if (!playbackInfoHasTrack(nowPlaying)) return;
+				nowPlaying.progress = ms - timeRelative;
+				enableBtn(IDs.btnSeek);
+				seekingDisabled = false;
+			}, 6000);
 		};
 
 		ws.on.audioEmptied = (el) => {
