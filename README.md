@@ -1,18 +1,12 @@
-# create-svelte
+# Musicat Dashboard
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+This Dashboard was made without much ideas in my mind, if anyone have any ideas feel free to create an issue or even PR.
 
-## Creating a project
+![image](ss.png)
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Setup
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+- Fill out `src/lib/config.ts`, see `src/lib/config.example.ts` for example
 
 ## Developing
 
@@ -26,8 +20,6 @@ npm run dev -- --open
 ```
 
 ## Building
-
-To create a production version of your app:
 
 ```bash
 npm run build
