@@ -3,5 +3,5 @@ export function matchPath(path: string, pathname: string): boolean {
 }
 
 export function createLoginRedirectParam(pathname: string) {
-	return `redirect=${encodeURIComponent(pathname)}`;
+	return `redirect_uri=${encodeURIComponent(pathname)}`;
 }
