@@ -33,6 +33,24 @@ export enum EventTypeE {
 	PROGRESS
 }
 
+// prettier-ignore
+export const BinaryEventTypeMap = {
+	[EventTypeE.ERROR]              : 'e',
+	[EventTypeE.PAUSE]              : 'p',
+	[EventTypeE.PLAYBACK_INFO]      : 'P',
+	[EventTypeE.PLAY]               : 'c',
+	[EventTypeE.SEEK]               : 's',
+	[EventTypeE.STOP]               : 'x',
+	[EventTypeE.FX]                 : 'f',
+	[EventTypeE.QUEUE]              : 'q',
+	[EventTypeE.REGISTER]           : 'r',
+	[EventTypeE.NEXT]               : 'n',
+	[EventTypeE.PREV]               : 'z',
+	[EventTypeE.JOINVC]             : 'j',
+	[EventTypeE.LEAVEVC]            : 'l',
+	[EventTypeE.PROGRESS]           : 'S'
+}
+
 export interface ErrorInfo {
 	error: true;
 	error_message: string | object; // !TODO: add interface
@@ -76,19 +94,56 @@ export interface PlaybackInfo extends TrackInfo {
 	repeat: number;
 }
 
+// prettier-ignore
 export interface EventData {
-	[EventTypeE.ERROR]: ErrorInfo;
-	[EventTypeE.PAUSE]: null;
-	[EventTypeE.PLAYBACK_INFO]: PlaybackInfo;
-	[EventTypeE.PLAY]: null;
-	[EventTypeE.SEEK]: number;
-	[EventTypeE.STOP]: null;
-	[EventTypeE.FX]: FXInfo;
-	[EventTypeE.QUEUE]: TrackInfo[];
-	[EventTypeE.JOINVC]: null;
-	[EventTypeE.LEAVEVC]: null;
-	[EventTypeE.PROGRESS]: number;
+	[EventTypeE.ERROR]              : ErrorInfo;
+	[EventTypeE.PAUSE]              : null;
+	[EventTypeE.PLAYBACK_INFO]      : PlaybackInfo;
+	[EventTypeE.PLAY]               : null;
+	[EventTypeE.SEEK]               : number;
+	[EventTypeE.STOP]               : null;
+	[EventTypeE.FX]                 : FXInfo;
+	[EventTypeE.QUEUE]              : TrackInfo[];
+	[EventTypeE.JOINVC]             : null;
+	[EventTypeE.LEAVEVC]            : null;
+	[EventTypeE.PROGRESS]           : number;
 }
+
+export interface BinaryArg {
+	str: string;
+	buf: ArrayBuffer;
+}
+
+function parse_int32(args: BinaryArg[]) {
+	const num = args[1];
+
+	if (num.str.length > 4 /* count null terminator */) {
+		const view = new DataView(num.buf);
+		const val = view.getUint32(0);
+		return val;
+	}
+
+	return Number(num.str);
+}
+
+function null_parser(args: BinaryArg[]) {
+	return null;
+}
+
+// prettier-ignore
+export const EventBinaryDataParser = {
+	[EventTypeE.ERROR]              : null,
+	[EventTypeE.PAUSE]              : null_parser,
+	[EventTypeE.PLAYBACK_INFO]      : null,
+	[EventTypeE.PLAY]               : null_parser,
+	[EventTypeE.SEEK]               : parse_int32,
+	[EventTypeE.STOP]               : null_parser,
+	[EventTypeE.FX]                 : null,
+	[EventTypeE.QUEUE]              : null,
+	[EventTypeE.JOINVC]             : null_parser,
+	[EventTypeE.LEAVEVC]            : null_parser,
+	[EventTypeE.PROGRESS]           : parse_int32,
+};
 
 export interface EventPayload {
 	[EventTypeE.PAUSE]: null;
@@ -186,6 +241,28 @@ function setColorHint(nowPlaying?: PlaybackInfo) {
 	// keep previous style
 	if (!nowPlaying.thumbnail) return;
 	document.body.style.backgroundImage = `url(${nowPlaying.thumbnail || ''})`;
+}
+
+function parseBinaryToArgs(m: ArrayBuffer) {
+	const view = new DataView(m);
+	const args: BinaryArg[] = [];
+	let arg = '';
+	for (let i = 0; i < m.byteLength; i++) {
+		const char = String.fromCharCode(view.getInt8(i));
+		if (i === 0) {
+			args.push({ str: char, buf: m.slice(0, 1) });
+			continue;
+		}
+		arg += char;
+	}
+
+	if (arg.length) {
+		args.push({ str: arg, buf: m.slice(1, m.byteLength) });
+		arg = '';
+	}
+
+	console.log(args);
+	return args;
 }
 
 export class WSCon {
@@ -338,9 +415,20 @@ export class WSCon {
 			});
 		});
 
-		this.con.addEventListener('message', (event) => {
-			event.data.text().then((message: string) => {
-				this.messageHandler(message);
+		this.con.addEventListener('message', async (event: MessageEvent<Blob>) => {
+			const data = event.data;
+			if (!data.size) return;
+
+			const peek = await data.slice(0, 1).text();
+			const isJson = peek[0] === '{';
+			if (isJson) {
+				event.data.text().then((message: string) => {
+					this.messageHandler(message);
+				});
+				return;
+			}
+			event.data.arrayBuffer().then((message: ArrayBuffer) => {
+				this.handleBinaryMessage(message);
 			});
 		});
 
@@ -371,6 +459,31 @@ export class WSCon {
 			console.error('Got unexpected message:');
 			console.error(message);
 		}
+	}
+
+	handleBinaryMessage(m: ArrayBuffer) {
+		const args = parseBinaryToArgs(m);
+		const typeChar = args[0].str;
+
+		let eventType: keyof typeof EventBinaryDataParser | undefined;
+		for (const k in BinaryEventTypeMap) {
+			const key: keyof typeof EventBinaryDataParser = Number(k);
+			if (BinaryEventTypeMap[key] !== typeChar) continue;
+			eventType = key;
+			break;
+		}
+
+		if (!eventType) return;
+		const parser = EventBinaryDataParser[eventType];
+		if (!parser) {
+			if (args.length === 1 && args[0].str.length > 1) {
+				this.messageHandler(typeChar);
+				return;
+			}
+			return;
+		}
+		const d = parser(args);
+		this.handleJsonMessage({ e: eventType, d } as WSConJSONMessage);
 	}
 
 	handleJsonMessage(json: WSConJSONMessage) {
