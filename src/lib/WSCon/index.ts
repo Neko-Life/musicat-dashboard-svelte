@@ -27,7 +27,9 @@ export enum EventTypeE {
 	QUEUE,
 	REGISTER,
 	NEXT,
-	PREV
+	PREV,
+	JOINVC,
+	LEAVEVC
 }
 
 export interface ErrorInfo {
@@ -82,6 +84,8 @@ export interface EventData {
 	[EventTypeE.STOP]: null;
 	[EventTypeE.FX]: FXInfo;
 	[EventTypeE.QUEUE]: TrackInfo[];
+	[EventTypeE.JOINVC]: null;
+	[EventTypeE.LEAVEVC]: null;
 }
 
 export interface EventPayload {
@@ -128,6 +132,8 @@ export interface WSConEventHandler {
 	stop: () => void;
 	fx: (info: FXInfo) => void;
 	queue: (queue: TrackInfo[]) => void;
+	join: () => void;
+	leave: () => void;
 }
 
 async function installPromiseLogger(n: string, p: Promise<any>) {
@@ -260,17 +266,6 @@ export class WSCon {
 			this.on?.audioPaused?.(newAudio);
 		};
 		newAudio.addEventListener('stalled', stallHandler);
-
-		// const durationchangeHandler = async () => {
-		// 	if (newAudio.paused && audioElIsBuffered(newAudio)) {
-		// 		await installPromiseLogger(
-		// 			'durationchangeHandler newAudio.play()',
-		// 			newAudio.play()
-		// 		);
-		// 	}
-		// };
-		// newAudio.addEventListener('durationchange', durationchangeHandler);
-		// newAudio.addEventListener('progress', durationchangeHandler);
 
 		const timeupdateHandler = () => {
 			this.on.audioTimeUpdate?.(newAudio);
@@ -406,6 +401,12 @@ export class WSCon {
 				break;
 			case EventTypeE.QUEUE:
 				this.on.queue?.(json.d);
+				break;
+			case EventTypeE.JOINVC:
+				this.on.join?.();
+				break;
+			case EventTypeE.LEAVEVC:
+				this.on.leave?.();
 				break;
 		}
 	}

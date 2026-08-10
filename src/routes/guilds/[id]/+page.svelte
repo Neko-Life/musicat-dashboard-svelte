@@ -72,7 +72,34 @@
 		if (btn instanceof HTMLButtonElement) btn.disabled = true;
 	}
 
+	function enableSeeking() {
+		enableBtn(IDs.btnSeek);
+		seekingDisabled = false;
+	}
+
+	function disableSeeking() {
+		disableBtn(IDs.btnSeek);
+		seekingDisabled = true;
+	}
+
+	function enableAllButtons() {
+		enableBtn(IDs.btnPrev);
+		enableBtn(IDs.btnNext);
+		enableBtn(IDs.btnPP);
+		enableBtn(IDs.btnStop);
+		enableSeeking();
+	}
+
 	function attachListeners(ws: WSCon) {
+		ws.on.join = () => {
+			// enable all buttons
+			enableAllButtons();
+		};
+
+		ws.on.leave = () => {
+			console.warn("You just left the guild's voice channel");
+		};
+
 		ws.on.playbackInfo = (d: PlaybackInfo) => {
 			if (!playbackInfoHasTrack(nowPlaying)) {
 				nowPlaying = d;
@@ -82,20 +109,17 @@
 					total: nowPlaying?.duration
 				});
 			} else delayNowPlaying = d;
-
-			enableBtn(IDs.btnPrev);
-			enableBtn(IDs.btnNext);
 		};
 
 		ws.on.play = () => {
 			if (nowPlaying) nowPlaying.paused = false;
-			enableBtn(IDs.btnPP);
-			enableBtn(IDs.btnPrev);
+			enableAllButtons();
 		};
 
 		ws.on.pause = () => {
 			if (nowPlaying) nowPlaying.paused = true;
 			enableBtn(IDs.btnPP);
+			enableBtn(IDs.btnStop);
 		};
 
 		ws.on.stop = () => {
@@ -105,8 +129,7 @@
 		};
 
 		ws.on.seek = (ms: number) => {
-			disableBtn(IDs.btnSeek);
-			seekingDisabled = true;
+			disableSeeking();
 			const tsEl = getEl(IDs.hoverTs);
 			if (tsEl) tsEl.textContent = msToDisplay(ms);
 
@@ -114,9 +137,9 @@
 			setTimeout(() => {
 				if (!playbackInfoHasTrack(nowPlaying)) return;
 				nowPlaying.progress = ms - timeRelative;
-				enableBtn(IDs.btnSeek);
 				enableBtn(IDs.btnPrev);
-				seekingDisabled = false;
+				enableSeeking();
+				enableBtn(IDs.btnStop);
 			}, 6000);
 		};
 
@@ -314,8 +337,7 @@
 		const ms = (totalMs / 100) * percent;
 		ws.seek(ms);
 
-		disableBtn(IDs.btnSeek);
-		seekingDisabled = true;
+		disableSeeking();
 	}
 
 	function handleMouseMoveSeek(e: MouseEvent) {
