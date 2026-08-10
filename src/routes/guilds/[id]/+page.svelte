@@ -103,11 +103,11 @@
 		ws.on.playbackInfo = (d: PlaybackInfo) => {
 			if (!playbackInfoHasTrack(nowPlaying)) {
 				nowPlaying = d;
-				// updateProgress({
-				// 	base: nowPlaying?.progress,
-				// 	rel: 0,
-				// 	total: nowPlaying?.duration
-				// });
+				updateProgress({
+					base: nowPlaying?.progress,
+					rel: 0,
+					total: nowPlaying?.duration
+				});
 			} else delayNowPlaying = d;
 		};
 
