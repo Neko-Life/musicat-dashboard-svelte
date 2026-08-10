@@ -23,7 +23,7 @@
 	// WebSocket //////////////////////////////////////
 
 	let ws: WSCon | undefined;
-	$effect(() => {
+	function wsMount() {
 		ws = new WSCon(getWSUrl('/ws/player/' + params.id), params.id);
 		(window as any).ws = ws;
 		attachListeners(ws);
@@ -33,16 +33,23 @@
 			() => document.querySelector('#bottom')?.scrollIntoView({ behavior: 'smooth' }),
 			1000
 		);
-	});
+	}
+
+	function tryPlayHandler() {
+		ws?.tryPlayIfNotPlaying();
+	}
 
 	function orientationChangeHandler() {
 		setTimeout(calcGPRDimension, 100);
 	}
 	onMount(() => {
+		wsMount();
 		const wsUnmount = ws?.onMount();
 		window.screen.orientation.addEventListener('change', orientationChangeHandler);
+		document.body.addEventListener('click', tryPlayHandler);
 
 		return () => {
+			document.body.removeEventListener('click', tryPlayHandler);
 			window.screen.orientation.removeEventListener('change', orientationChangeHandler);
 			wsUnmount?.();
 		};

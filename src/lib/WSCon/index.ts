@@ -574,6 +574,11 @@ export class WSCon {
 		return this.audioEl.muted;
 	}
 
+	tryPlayIfNotPlaying() {
+		if (!this.audioEl || this.audioEl.played.end(0) || this.audioEl.paused) return;
+		this.audioEl.play();
+	}
+
 	////////////////////////////////////////////////////////////////////////////////
 
 	play() {
