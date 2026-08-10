@@ -103,11 +103,11 @@
 		ws.on.playbackInfo = (d: PlaybackInfo) => {
 			if (!playbackInfoHasTrack(nowPlaying)) {
 				nowPlaying = d;
-				updateProgress({
-					base: nowPlaying?.progress,
-					rel: 0,
-					total: nowPlaying?.duration
-				});
+				// updateProgress({
+				// 	base: nowPlaying?.progress,
+				// 	rel: 0,
+				// 	total: nowPlaying?.duration
+				// });
 			} else delayNowPlaying = d;
 		};
 
@@ -128,19 +128,31 @@
 			enableBtn(IDs.btnStop);
 		};
 
+		ws.on.progress = (ms: number) => {
+			enableBtn(IDs.btnPrev);
+			enableSeeking();
+			enableBtn(IDs.btnStop);
+
+			updateProgress({
+				base: 0,
+				rel: ms,
+				total: nowPlaying?.duration
+			});
+		};
+
 		ws.on.seek = (ms: number) => {
 			disableSeeking();
 			const tsEl = getEl(IDs.hoverTs);
 			if (tsEl) tsEl.textContent = msToDisplay(ms);
 
-			// accounting audio element buffering
-			setTimeout(() => {
-				if (!playbackInfoHasTrack(nowPlaying)) return;
-				nowPlaying.progress = ms - timeRelative;
-				enableBtn(IDs.btnPrev);
-				enableSeeking();
-				enableBtn(IDs.btnStop);
-			}, 6000);
+			// // accounting audio element buffering
+			// setTimeout(() => {
+			// 	if (!playbackInfoHasTrack(nowPlaying)) return;
+			// 	nowPlaying.progress = ms - timeRelative;
+			// 	enableBtn(IDs.btnPrev);
+			// 	enableSeeking();
+			// 	enableBtn(IDs.btnStop);
+			// }, 6000);
 		};
 
 		ws.on.audioEmptied = (el) => {
@@ -153,16 +165,16 @@
 			if (el === ws.audioEl) nowPlaying = null;
 		};
 
-		ws.on.audioTimeUpdate = (audioEl: HTMLAudioElement) => {
-			const newRel = audioEl.currentTime * 1000;
-			timeRelative = newRel;
+		// ws.on.audioTimeUpdate = (audioEl: HTMLAudioElement) => {
+		// 	const newRel = audioEl.currentTime * 1000;
+		// 	timeRelative = newRel;
 
-			updateProgress({
-				base: nowPlaying?.progress,
-				rel: newRel,
-				total: nowPlaying?.duration
-			});
-		};
+		// 	updateProgress({
+		// 		base: nowPlaying?.progress,
+		// 		rel: newRel,
+		// 		total: nowPlaying?.duration
+		// 	});
+		// };
 	}
 
 	// UI //////////////////////////////////////

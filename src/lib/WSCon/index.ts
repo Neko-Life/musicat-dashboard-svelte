@@ -29,7 +29,8 @@ export enum EventTypeE {
 	NEXT,
 	PREV,
 	JOINVC,
-	LEAVEVC
+	LEAVEVC,
+	PROGRESS
 }
 
 export interface ErrorInfo {
@@ -86,6 +87,7 @@ export interface EventData {
 	[EventTypeE.QUEUE]: TrackInfo[];
 	[EventTypeE.JOINVC]: null;
 	[EventTypeE.LEAVEVC]: null;
+	[EventTypeE.PROGRESS]: number;
 }
 
 export interface EventPayload {
@@ -134,6 +136,7 @@ export interface WSConEventHandler {
 	queue: (queue: TrackInfo[]) => void;
 	join: () => void;
 	leave: () => void;
+	progress: (ms: number) => void;
 }
 
 async function installPromiseLogger(n: string, p: Promise<any>) {
@@ -407,6 +410,9 @@ export class WSCon {
 				break;
 			case EventTypeE.LEAVEVC:
 				this.on.leave?.();
+				break;
+			case EventTypeE.PROGRESS:
+				this.on.progress?.(json.d);
 				break;
 		}
 	}
