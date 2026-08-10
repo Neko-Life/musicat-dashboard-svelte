@@ -117,7 +117,7 @@ export interface BinaryArg {
 function parse_int32(args: BinaryArg[]) {
 	const num = args[1];
 
-	if (num.str.length > 4 /* count null terminator */) {
+	if (num.str.length > 3) {
 		const view = new DataView(num.buf);
 		const val = view.getUint32(0);
 		return val;
@@ -261,7 +261,6 @@ function parseBinaryToArgs(m: ArrayBuffer) {
 		arg = '';
 	}
 
-	console.log(args);
 	return args;
 }
 
