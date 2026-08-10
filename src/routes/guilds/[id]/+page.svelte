@@ -377,8 +377,8 @@
 	}
 
 	function doneSeeking() {
-		document.body.removeEventListener('mousemove', handleMouseMoveSeek);
-		document.body.removeEventListener('mouseup', handleBtnSeekClickRelease);
+		document.body.removeEventListener('pointermove', handleMouseMoveSeek);
+		document.body.removeEventListener('pointerup', handleBtnSeekClickRelease);
 		document.body.removeEventListener('keydown', cancelSeekHandler);
 		isSeeking = false;
 	}
@@ -389,9 +389,10 @@
 	}
 
 	function handleBtnSeekClick(e: MouseEvent) {
+                console.log({e});
 		isSeeking = true;
-		document.body.addEventListener('mousemove', handleMouseMoveSeek);
-		document.body.addEventListener('mouseup', handleBtnSeekClickRelease);
+		document.body.addEventListener('pointermove', handleMouseMoveSeek);
+		document.body.addEventListener('pointerup', handleBtnSeekClickRelease);
 		document.body.addEventListener('keydown', cancelSeekHandler);
 	}
 
@@ -505,7 +506,7 @@
 						class="progress-container{seekingDisabled ? ' disabled' : ''}"
 						role="progressbar"
 						onclick={seekingDisabled ? undefined : handleProgressClick}
-						onmousemove={handleProgressHover}
+						onpointermove={handleProgressHover}
 					>
 						<div bind:this={progressEl} class="progress-progress">
 							<div class="progress-seek">
@@ -514,7 +515,7 @@
 										id={IDs.btnSeek}
 										aria-label="Seek Button"
 										class="btn-nostyle seek-btn"
-										onmousedown={handleBtnSeekClick}
+										onpointerdown={handleBtnSeekClick}
 									></button>
 								</div>
 							</div>
