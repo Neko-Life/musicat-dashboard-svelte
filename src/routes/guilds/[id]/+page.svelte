@@ -165,6 +165,16 @@
 		});
 	}
 
+	function mediaSessionHandlePlay() {
+		if (!('mediaSession' in navigator)) return;
+		navigator.mediaSession.playbackState = 'playing';
+	}
+
+	function mediaSessionHandlePause() {
+		if (!('mediaSession' in navigator)) return;
+		navigator.mediaSession.playbackState = 'paused';
+	}
+
 	function attachListeners(ws: WSCon) {
 		ws.on.join = () => {
 			// enable all buttons
@@ -190,12 +200,14 @@
 		ws.on.play = () => {
 			if (nowPlaying) nowPlaying.paused = false;
 			enableAllButtons();
+			mediaSessionHandlePlay();
 		};
 
 		ws.on.pause = () => {
 			if (nowPlaying) nowPlaying.paused = true;
 			enableBtn(IDs.btnPP);
 			enableBtn(IDs.btnStop);
+			mediaSessionHandlePause();
 		};
 
 		ws.on.stop = () => {
