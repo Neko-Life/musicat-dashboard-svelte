@@ -35,6 +35,52 @@
 		);
 	}
 
+	function setupMediaSession() {
+		if (!('mediaSession' in navigator)) return;
+
+		navigator.mediaSession.setActionHandler('play', (details) => {
+			const { action, fastSeek, seekOffset, seekTime } = details;
+			handlePlayPause();
+		});
+		navigator.mediaSession.setActionHandler('pause', (details) => {
+			const { action, fastSeek, seekOffset, seekTime } = details;
+			handlePlayPause();
+		});
+		navigator.mediaSession.setActionHandler('stop', (details) => {
+			const { action, fastSeek, seekOffset, seekTime } = details;
+			handleStop();
+		});
+		navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+			const { action, fastSeek, seekOffset, seekTime } = details;
+		});
+		navigator.mediaSession.setActionHandler('seekforward', (details) => {
+			const { action, fastSeek, seekOffset, seekTime } = details;
+		});
+		navigator.mediaSession.setActionHandler('seekto', (details) => {
+			const { action, fastSeek, seekOffset, seekTime } = details;
+		});
+		navigator.mediaSession.setActionHandler('previoustrack', (details) => {
+			const { action, fastSeek, seekOffset, seekTime } = details;
+			handlePrev();
+		});
+		navigator.mediaSession.setActionHandler('nexttrack', (details) => {
+			const { action, fastSeek, seekOffset, seekTime } = details;
+			handleNext();
+		});
+	}
+
+	function unMountMediaSession() {
+		if (!('mediaSession' in navigator)) return;
+		navigator.mediaSession.setActionHandler('play', null);
+		navigator.mediaSession.setActionHandler('pause', null);
+		navigator.mediaSession.setActionHandler('stop', null);
+		navigator.mediaSession.setActionHandler('seekbackward', null);
+		navigator.mediaSession.setActionHandler('seekforward', null);
+		navigator.mediaSession.setActionHandler('seekto', null);
+		navigator.mediaSession.setActionHandler('previoustrack', null);
+		navigator.mediaSession.setActionHandler('nexttrack', null);
+	}
+
 	function tryPlayHandler() {
 		ws?.tryPlayIfNotPlaying();
 	}
@@ -44,6 +90,7 @@
 	}
 	onMount(() => {
 		wsMount();
+		setupMediaSession();
 		const wsUnmount = ws?.onMount();
 		window.screen.orientation.addEventListener('change', orientationChangeHandler);
 		document.body.addEventListener('click', tryPlayHandler);
@@ -51,12 +98,14 @@
 		return () => {
 			document.body.removeEventListener('click', tryPlayHandler);
 			window.screen.orientation.removeEventListener('change', orientationChangeHandler);
+			unMountMediaSession();
 			wsUnmount?.();
 		};
 	});
 
 	let delayNowPlaying: PlaybackInfo | undefined | null = $state();
 	let nowPlaying: PlaybackInfo | undefined | null = $state();
+	const usingThumbnail = $derived(nowPlaying?.thumbnail || musicatUser?.data?.data?.avatar_url);
 	let timeRelative: number = $state(0);
 	let seekingDisabled = $state(false);
 	let isSeeking = $state(false);
@@ -97,6 +146,25 @@
 		enableSeeking();
 	}
 
+	function mediaSessionPlaybackInfo(pbinfo: PlaybackInfo | null) {
+		if (!('mediaSession' in navigator)) return;
+		if (!pbinfo) return (navigator.mediaSession.metadata = null);
+		navigator.mediaSession.metadata = new MediaMetadata({
+			title: pbinfo.title,
+			artist: pbinfo.username,
+			// album: '',
+			artwork: usingThumbnail
+				? [
+						{
+							src: usingThumbnail
+							// sizes: '96x96',
+							// type: 'image/jpg'
+						}
+					]
+				: []
+		});
+	}
+
 	function attachListeners(ws: WSCon) {
 		ws.on.join = () => {
 			// enable all buttons
@@ -115,6 +183,7 @@
 					rel: 0,
 					total: nowPlaying?.duration
 				});
+				mediaSessionPlaybackInfo(nowPlaying);
 			} else delayNowPlaying = d;
 		};
 
@@ -132,6 +201,7 @@
 		ws.on.stop = () => {
 			delayNowPlaying = null;
 			nowPlaying = null;
+			mediaSessionPlaybackInfo(nowPlaying);
 			enableBtn(IDs.btnStop);
 		};
 
@@ -167,6 +237,7 @@
 			if (delayNowPlaying) {
 				nowPlaying = delayNowPlaying;
 				delayNowPlaying = null;
+				mediaSessionPlaybackInfo(nowPlaying);
 				return;
 			}
 			if (el === ws.audioEl) nowPlaying = null;
@@ -321,13 +392,13 @@
 		showMobileVolumeInput = !showMobileVolumeInput;
 	}
 
-	function handlePrev(e: MouseEvent) {
+	function handlePrev(e?: MouseEvent) {
 		if (!ws) return;
 		ws.prev();
 		disableBtn(IDs.btnPrev);
 	}
 
-	function handlePlayPause(e: MouseEvent) {
+	function handlePlayPause(e?: MouseEvent) {
 		if (!ws) return;
 		if (!ws.audioEl) return ws.play();
 
@@ -337,13 +408,13 @@
 		disableBtn(IDs.btnPP);
 	}
 
-	function handleStop(e: MouseEvent) {
+	function handleStop(e?: MouseEvent) {
 		if (!ws) return;
 		ws.stop();
 		disableBtn(IDs.btnStop);
 	}
 
-	function handleNext(e: MouseEvent) {
+	function handleNext(e?: MouseEvent) {
 		if (!ws) return;
 		ws.next();
 		disableBtn(IDs.btnNext);
@@ -389,7 +460,7 @@
 	}
 
 	function handleBtnSeekClick(e: MouseEvent) {
-                console.log({e});
+		console.log({ e });
 		isSeeking = true;
 		document.body.addEventListener('pointermove', handleMouseMoveSeek);
 		document.body.addEventListener('pointerup', handleBtnSeekClickRelease);
@@ -474,10 +545,7 @@
 		<div class="content-container">
 			<div class="content glass-card">
 				<div class="thumbnail-container">
-					<img
-						src={nowPlaying?.thumbnail || musicatUser?.data?.data?.avatar_url}
-						alt="Song Thumbnail"
-					/>
+					<img src={usingThumbnail} alt="Song Thumbnail" />
 				</div>
 				{#if !playbackInfoHasTrack(nowPlaying)}
 					<div class="desc-container Author-MediumItalic">
@@ -747,7 +815,8 @@
 	}
 
 	.progress-tooltip-container-container {
-		display: none;
+		opacity: 0;
+		pointer-events: none;
 		position: absolute;
 
 		top: -100%;
@@ -781,7 +850,8 @@
 
 	.progress-container:hover .progress-tooltip-container-container,
 	.controls.seeking .progress-tooltip-container-container {
-		display: flex;
+		opacity: 1;
+		pointer-events: auto;
 	}
 
 	.progress-progress {
@@ -800,7 +870,7 @@
 
 	.controls:hover .progress-progress,
 	.controls.seeking .progress-progress {
-		height: 8px;
+		height: 12px;
 	}
 
 	.progress-seek {
@@ -830,8 +900,8 @@
 	.controls:hover .seek-btn,
 	.controls.seeking .seek-btn,
 	.seek-hover:hover .seek-btn {
-		width: 20px;
-		height: 20px;
+		width: 28px;
+		height: 28px;
 		pointer-events: all;
 	}
 
