@@ -274,12 +274,14 @@ export class WSCon {
 	reconnectInterval: number | null | undefined;
 	debugMode: boolean;
 	volume: number;
+	muted: boolean;
 
 	on: Partial<WSConEventHandler>;
 
 	constructor(url: string, guildId: string) {
 		this.debugMode = DEBUG_LOG;
 		this.volume = 1;
+		this.muted = false;
 		this.on = {};
 		this.waved = false;
 		this.guildId = guildId;
@@ -327,6 +329,7 @@ export class WSCon {
 		this.on?.audioLoading?.(newAudio);
 		newAudio.id = aid;
 		newAudio.volume = this.volume;
+		newAudio.muted = this.muted;
 		newAudio.src = this.getStreamUrl() + '?ts=' + ts;
 
 		const endHandler = () => {
@@ -571,6 +574,7 @@ export class WSCon {
 	toggleMute() {
 		if (!this.audioEl) return;
 		this.audioEl.muted = !this.audioEl.muted;
+		this.muted = this.audioEl.muted;
 		return this.audioEl.muted;
 	}
 
