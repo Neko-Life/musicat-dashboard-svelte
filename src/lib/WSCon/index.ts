@@ -309,6 +309,65 @@ export class WSCon {
 		this.resetAudioElement(true);
 	}
 
+	setupHandlers() {
+		this.con.addEventListener('open', (event) => {
+			this.clearReconnectInterval();
+
+			console.log('WSCon: Open!');
+			if (!localUser) throw new Error('You need to login to listen to voice session!');
+
+			this.send({
+				e: EventTypeE.REGISTER,
+				d: {
+					uid: localUser?.id
+				}
+			});
+		});
+
+		this.con.addEventListener('message', async (event: MessageEvent<Blob>) => {
+			const data = event.data;
+			if (!data.size) return;
+
+			const peek = await data.slice(0, 1).text();
+			const isJson = peek[0] === '{';
+			if (isJson) {
+				event.data.text().then((message: string) => {
+					this.messageHandler(message);
+				});
+				return;
+			}
+			event.data.arrayBuffer().then((message: ArrayBuffer) => {
+				this.handleBinaryMessage(message);
+			});
+		});
+
+		this.con.addEventListener('error', (event) => {
+			console.error('WSCon: Error:', event);
+		});
+
+		this.con.addEventListener('close', (event) => {
+			if (event.wasClean) {
+				console.log(`WSCon: Closed cleanly, code=${event.code}, reason=${event.reason}`);
+			} else {
+				console.log('WSCon: Connection died');
+				this.handleSeveredConnection();
+			}
+		});
+	}
+
+	handleSeveredConnection() {
+		// reconnect on interval
+		if (typeof this.reconnectInterval === 'number') return;
+		this.reconnectInterval = setInterval(() => this.reconnect(), 1000);
+	}
+
+	clearReconnectInterval() {
+		if (typeof this.reconnectInterval === 'number') {
+			clearInterval(this.reconnectInterval);
+			this.reconnectInterval = null;
+		}
+	}
+
 	resetAudioElement(unMount: boolean = false) {
 		if (!this.hasAudioElement()) return;
 
@@ -400,52 +459,6 @@ export class WSCon {
 
 	send(o: WSConJSONPayload) {
 		this.con.send(JSON.stringify(o));
-	}
-
-	setupHandlers() {
-		this.con.addEventListener('open', (event) => {
-			this.clearReconnectInterval();
-
-			console.log('WSCon: Open!');
-			if (!localUser) throw new Error('You need to login to listen to voice session!');
-
-			this.send({
-				e: EventTypeE.REGISTER,
-				d: {
-					uid: localUser?.id
-				}
-			});
-		});
-
-		this.con.addEventListener('message', async (event: MessageEvent<Blob>) => {
-			const data = event.data;
-			if (!data.size) return;
-
-			const peek = await data.slice(0, 1).text();
-			const isJson = peek[0] === '{';
-			if (isJson) {
-				event.data.text().then((message: string) => {
-					this.messageHandler(message);
-				});
-				return;
-			}
-			event.data.arrayBuffer().then((message: ArrayBuffer) => {
-				this.handleBinaryMessage(message);
-			});
-		});
-
-		this.con.addEventListener('error', (event) => {
-			console.error('WSCon: Error:', event);
-		});
-
-		this.con.addEventListener('close', (event) => {
-			if (event.wasClean) {
-				console.log(`WSCon: Closed cleanly, code=${event.code}, reason=${event.reason}`);
-			} else {
-				console.log('WSCon: Connection died');
-				this.handleSeveredConnection();
-			}
-		});
 	}
 
 	messageHandler(message: string) {
@@ -543,19 +556,6 @@ export class WSCon {
 			this.createAudioElement();
 			this.audioEl?.load();
 		}, 100);
-	}
-
-	handleSeveredConnection() {
-		// reconnect on interval
-		if (typeof this.reconnectInterval === 'number') return;
-		this.reconnectInterval = setInterval(() => this.reconnect(), 1000);
-	}
-
-	clearReconnectInterval() {
-		if (typeof this.reconnectInterval === 'number') {
-			clearInterval(this.reconnectInterval);
-			this.reconnectInterval = null;
-		}
 	}
 
 	hasAudioElement() {
