@@ -2,7 +2,7 @@
 	let { hidden }: { hidden: boolean | undefined } = $props();
 
 	import Button from './common/Button.svelte';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { getUserAvatarLink } from '$lib/utils/user';
 	import AvatarButton from './Navbar/AvatarButton.svelte';
@@ -78,7 +78,7 @@
 
 {#snippet musicatInviteBtn()}
 	<Button
-		href={'/login?' + createLoginRedirectParam($page.url.pathname) + '&invite=1'}
+		href={'/login?' + createLoginRedirectParam(page.url.pathname) + '&invite=1'}
 		class="btn-login">Invite</Button
 	>
 {/snippet}
@@ -129,7 +129,7 @@
 				{#each menuList as menu}
 					<Menu
 						on:click={() => handleMenuClick(menu)}
-						active={matchPath(menu.path, $page.url.pathname)}
+						active={matchPath(menu.path, page.url.pathname)}
 						href={menu.path}
 					>
 						<span class="menu-name">{menu.name}</span>
@@ -175,7 +175,7 @@
 		{#each menuList as menu}
 			<MenuMobile
 				on:click={() => handleMenuClick(menu, true)}
-				active={matchPath(menu.path, $page.url.pathname)}
+				active={matchPath(menu.path, page.url.pathname)}
 				href={menu.path}
 			>
 				<span class="menu-name">{menu.name}</span>

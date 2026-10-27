@@ -1,7 +1,7 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 </script>
 
 <div class="full-page flex-center">
-	<h1>{$page.status} {$page.error?.message}</h1>
+	<h1>{page.status} {page.error?.message}</h1>
 </div>

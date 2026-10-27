@@ -12,26 +12,26 @@
 		"format": "prettier --plugin-search-dir . --write ."
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-node": "^5.5.7",
-		"@sveltejs/kit": "^2.69.2",
-		"@sveltejs/vite-plugin-svelte": "^7.1.2",
-		"@typescript-eslint/eslint-plugin": "^8.63.0",
-		"@typescript-eslint/parser": "^8.63.0",
-		"eslint": "^10.7.0",
+		"@sveltejs/adapter-node": "^6.0.0",
+		"@sveltejs/kit": "^3.1.0",
+		"@sveltejs/vite-plugin-svelte": "^7.3.1",
+		"@typescript-eslint/eslint-plugin": "^8.72.1",
+		"@typescript-eslint/parser": "^8.72.1",
+		"eslint": "^10.13.0",
 		"eslint-config-prettier": "^10.1.8",
-		"eslint-plugin-svelte": "^3.20.0",
-		"prettier": "^3.9.5",
+		"eslint-plugin-svelte": "^3.23.1",
+		"prettier": "^3.9.10",
 		"prettier-plugin-svelte": "^4.1.1",
-		"svelte": "^5.56.4",
-		"svelte-check": "^4.7.2",
+		"svelte": "^5.57.3",
+		"svelte-check": "^4.7.7",
 		"tslib": "^2.4.1",
-		"typescript": "^7.0.2",
-		"vite": "^8.1.4"
+		"typescript": "^6.0.3",
+		"vite": "^8.3.5"
 	},
 	"type": "module",
 	"dependencies": {
-		"@lottiefiles/dotlottie-svelte": "^0.10.9",
-		"@tanstack/svelte-query": "^6.1.36"
+		"@lottiefiles/dotlottie-svelte": "^0.10.16",
+		"@tanstack/svelte-query": "^6.3.6"
 	},
 	"packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }
